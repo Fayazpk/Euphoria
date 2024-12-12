@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: euphoria_development
+  username: postgres
+  password: '123'
+  host: localhost
+  port: 5432
+
+test:
+  <<: *default
+  database: euphoria_test
+  username: postgres
+  password: '123'
+  host: localhost
+  port: 5432
+
+

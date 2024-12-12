@@ -1,0 +1,136 @@
+/*
+ * This is a manifest file that'll be compiled into application.css.
+ *
+ * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
+ * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
+ * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
+ * depending on specificity.
+ *
+ * Consider organizing styles into separate files for maintainability.
+ */
+
+/* Custom Variables */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #34495e;
+  --accent-color: #e74c3c;
+  --text-color: #2c3e50;
+  --light-gray: #f8f9fa;
+  --border-radius: 8px;
+}
+
+/* Global Styles */
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+}
+
+/* Product Card */
+.product-card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: var(--border-radius);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.product-card img {
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  object-fit: cover;
+  height: 300px;
+}
+
+/* Category Card */
+.category-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+}
+
+.category-card img {
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.1);
+}
+
+.category-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+/* Forms */
+.form-control {
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .product-card img {
+    height: 200px;
+  }
+  
+  .navbar-brand img {
+    height: 30px;
+  }
+  
+  .footer {
+    text-align: center;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Cart Badge */
+.badge {
+  font-size: 0.7rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Newsletter Form */
+.newsletter-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+

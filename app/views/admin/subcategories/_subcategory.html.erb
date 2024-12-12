@@ -1,0 +1,23 @@
+<div id="<%= dom_id subcategory %>">
+  <p>
+    <strong>Name:</strong>
+    <%= subcategory.name %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= subcategory.description %>
+  </p>
+
+  <p>
+    <strong>Category:</strong>
+    <%= subcategory.category_id %>
+  </p>
+<p>
+  <% if subcategory.image.attached? %>
+  <%= image_tag subcategory.image, class: "subcategory-image", alt: subcategory.name %>
+<% else %>
+  <img src="https://placehold.co/400x500" alt="<%= subcategory.name %>" class="subcategory-image">
+<% end %>
+<p>
+</div>

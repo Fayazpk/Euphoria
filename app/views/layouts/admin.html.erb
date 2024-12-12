@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= yield :title %></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <style>
+        /* Your sidebar styles here */
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --light-bg: #f4f7fa;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 15px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .top-header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="text-center mb-4">
+            <h3 class="text-white">Admin Panel</h3>
+        </div>
+        <nav class="nav flex-column">
+            <%= link_to admin_dashboard_path, class: "nav-link" do %><i class="fas fa-chart-pie"></i>Dashboard<% end %>
+            <a class="nav-link" redirect_to admin_categories_path><i class="fas fa-box"></i> Products</a>
+            <%= link_to admin_categories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Categories<% end %>
+            <%= link_to admin_subcategories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Subcategories<% end %>
+            <a class="nav-link" href="#orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a class="nav-link" href="#coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
+            <a class="nav-link" href="#sales-report"><i class="fas fa-chart-line"></i> Sales Report</a>
+            <a class="nav-link" href="#users"><i class="fas fa-users"></i> Users</a>
+            <a class="nav-link" href="#banners"><i class="fas fa-image"></i> Banners</a>
+            <a class="nav-link" href="#settings"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <%= yield %>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

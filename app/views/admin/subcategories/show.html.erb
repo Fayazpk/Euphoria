@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @admin_subcategory %>
+
+<div>
+  <%= link_to "Edit this subcategory", edit_admin_subcategory_path(@admin_subcategory) %> |
+  <%= link_to "Back to subcategories", admin_subcategories_path %>
+
+  <%= button_to "Destroy this subcategory", @admin_subcategory, method: :delete %>
+</div>

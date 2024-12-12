@@ -1,0 +1,39 @@
+<%= form_with(model: [:admin, admin_subcategory], local: true) do |form| %>
+  <% if admin_subcategory.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(admin_subcategory.errors.count, "error") %> prohibited this subcategory from being saved:</h4>
+      <ul>
+        <% admin_subcategory.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :category_id, "Category", class: "form-label" %>
+    <%= form.collection_select :category_id, Category.all, :id, :name, 
+        { prompt: "Select a category" }, 
+        { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :image, class: "form-label" %>
+    <%= form.file_field :image, class: "form-control" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Back", admin_subcategories_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
