@@ -1,0 +1,92 @@
+<h1 class="mb-4">Create New Product</h1>
+
+<%= form_with(model: @product, url: admin_products_path, local: true, html: { multipart: true }) do |form| %>
+  <% if @product.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h4>
+      <ul>
+        <% @product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :name, "Product Name", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter product name" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :description, "Description", class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", placeholder: "Enter product description" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :category_id, "Category", class: "form-label" %>
+    <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Select a Category" }, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :subcategory_id, "Subcategory", class: "form-label" %>
+    <%= form.collection_select :subcategory_id, @subcategories, :id, :name, { prompt: "Select a Subcategory" }, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :size_id, "Size", class: "form-label" %>
+    <%= form.collection_select :size_id, @sizes, :id, :size, { prompt: "Select a Size" }, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :base_price, "Base Price", class: "form-label" %>
+    <%= form.number_field :base_price, step: 0.01, class: "form-control", placeholder: "Enter base price", id: "base_price" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.fields_for :discount do |discount_form| %>
+      <%= discount_form.label :discount_percentage, "Discount Percentage", class: "form-label" %>
+      <%= discount_form.number_field :discount_percentage, 
+            value: @product.discount&.discount_percentage || "", 
+            class: "form-control", 
+            step: 0.01, 
+            placeholder: "Enter discount percentage", 
+            id: "discount_percentage" %>
+    <% end %>
+  </div>
+
+  <div class="form-group">
+    <label>Final Price</label>
+    <input type="text" class="form-control" id="final_price" readonly>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :images, "Product Images", class: "form-label" %>
+    <%= form.file_field :images, multiple: true, class: "form-control" %>
+    <small class="form-text text-muted">Upload up to four images for the product.</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.submit "Create Product", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const basePriceInput = document.getElementById("base_price");
+    const discountPercentageInput = document.getElementById("discount_percentage");
+    const finalPriceInput = document.getElementById("final_price");
+
+    function calculateFinalPrice() {
+      const basePrice = parseFloat(basePriceInput.value) || 0;
+      const discountPercentage = parseFloat(discountPercentageInput.value) || 0;
+
+      const discountAmount = (basePrice * (discountPercentage / 100));
+      const finalPrice = basePrice - discountAmount;
+
+      finalPriceInput.value = finalPrice.toFixed(2); // Format to 2 decimal places
+    }
+
+    basePriceInput.addEventListener("input", calculateFinalPrice);
+    discountPercentageInput.addEventListener("input", calculateFinalPrice);
+  });
+</script>

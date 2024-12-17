@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_12_034807) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_17_043439) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,19 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_034807) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "admin_products", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.bigint "category_id", null: false
+    t.bigint "subcategory_id", null: false
+    t.bigint "size_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_admin_products_on_category_id"
+    t.index ["size_id"], name: "index_admin_products_on_size_id"
+    t.index ["subcategory_id"], name: "index_admin_products_on_subcategory_id"
+  end
+
   create_table "admin_subcategories", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -54,6 +67,35 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_034807) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.decimal "discount_percentage", precision: 5, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_discounts_on_product_id"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "category_id", null: false
+    t.bigint "subcategory_id", null: false
+    t.bigint "size_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "base_price", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "discount_percentage", precision: 5, scale: 2, default: "0.0"
+    t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["size_id"], name: "index_products_on_size_id"
+    t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
+  end
+
+  create_table "sizes", force: :cascade do |t|
+    t.string "size"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -79,6 +121,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_034807) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "admin_products", "categories"
+  add_foreign_key "admin_products", "sizes"
+  add_foreign_key "admin_products", "subcategories"
   add_foreign_key "admin_subcategories", "categories"
+  add_foreign_key "discounts", "products"
+  add_foreign_key "products", "categories"
+  add_foreign_key "products", "sizes"
+  add_foreign_key "products", "subcategories"
   add_foreign_key "subcategories", "categories"
 end

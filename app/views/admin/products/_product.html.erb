@@ -1,0 +1,14 @@
+<div id="<%= dom_id(@product) %>">
+  <p><strong>Name:</strong> <%= @product.name %></p>
+  <p><strong>Description:</strong> <%= @product.description %></p>
+  <p><strong>Category:</strong> <%= @product.category&.name || "N/A" %></p>
+  <p><strong>Subcategory:</strong> <%= @product.subcategory&.name || "N/A" %></p>
+  <p><strong>Size:</strong> <%= @product.size&.size || "N/A" %></p>
+  <p><strong>Base Price:</strong> <%= number_to_currency(@product.base_price) %></p>
+  <p><strong>Discount Percentage:</strong> <%= @product.discount&.discount_percentage || 0 %>%</p>
+  <p><strong>Final Price:</strong> <%= number_to_currency(@product.final_price) %></p>
+
+  <% @product.images.each do |image| %>
+    <%= image_tag image, width: 100, height: 100 %>
+  <% end %>
+</div>

@@ -1,5 +1,6 @@
 class Subcategory < ApplicationRecord
   belongs_to :category
+  has_many :products
   has_one_attached :image
 
   

@@ -1,0 +1,71 @@
+<% content_for :title, "Editing product" %>
+
+<h1>Editing product</h1>
+
+<%= form_with(model: @admin_product, url: admin_product_path(@admin_product), method: :patch, local: true, multipart: true) do |form| %>
+  <!-- Name Field -->
+  <div class="mb-3">
+    <%= form.label :name, "Product Name" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <!-- Description Field -->
+  <div class="mb-3">
+    <%= form.label :description, "Product Description" %>
+    <%= form.text_area :description, class: "form-control" %>
+  </div>
+
+  <!-- Category Select Field -->
+  <div class="mb-3">
+    <%= form.label :category_id, "Category" %>
+    <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Select a category" }, class: "form-select" %>
+  </div>
+
+  <!-- Subcategory Select Field -->
+  <div class="mb-3">
+    <%= form.label :subcategory_id, "Subcategory" %>
+    <%= form.grouped_collection_select :subcategory_id, Category.includes(:subcategories), :subcategories, :name, :id, :name, { prompt: "Select a subcategory" }, class: "form-select" %>
+  </div>
+
+  <!-- Size Select Field -->
+  <div class="mb-3">
+    <%= form.label :size_id, "Size" %>
+    <%= form.collection_select :size_id, Size.all, :id, :size, { prompt: "Select a size" }, class: "form-select" %>
+  </div>
+
+  <!-- Product Images Field -->
+  <div class="mb-3">
+    <%= form.label :images, "Product Images" %>
+    <%= form.file_field :images, multiple: true, class: "form-control" %>
+  </div>
+
+  <!-- Base Price Field -->
+  <div class="mb-3">
+    <%= form.label :base_price, "Base Price" %>
+    <%= form.number_field :base_price, step: 0.01, class: "form-control" %>
+  </div>
+
+  <!-- Discount Fields -->
+  <div class="mb-3">
+    <%= form.fields_for :discounts do |discount_form| %>
+      <div class="form-group">
+        <%= discount_form.label :discount_percentage, "Discount Percentage" %>
+        <%= discount_form.number_field :discount_percentage, step: 0.01, class: "form-control" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Submit Button -->
+  <div>
+    <%= form.submit "Update Product", class: "btn btn-primary" %>
+  </div>
+
+<% end %> <!-- Close the form_with block -->
+
+<br>
+
+<!-- Navigation Links -->
+<div>
+  <%= link_to "Show this product", admin_product_path(@admin_product) %> |
+  <%= link_to "Back to products", admin_products_path %>
+</div>

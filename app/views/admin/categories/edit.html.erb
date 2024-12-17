@@ -1,12 +1,43 @@
 <% content_for :title, "Editing category" %>
 
-<h1>Editing category</h1>
+<h1>Editing Category</h1>
 
-<%= render "form", admin_category: @admin_category %>
+<%= form_with(model: [:admin, @admin_category], local: true) do |form| %>
+
+  <% if @admin_category.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@admin_category.errors.count, "error") %> prohibited this category from being saved:</h4>
+      <ul>
+        <% @admin_category.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter category name" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", placeholder: "Enter category description" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :image, "Category Image", class: "form-label" %>
+    <%= form.file_field :image, class: "form-control" %>
+  </div>
+
+  <div class="mb-3 text-end">
+    <%= form.submit "Save Category", class: "btn btn-primary" %>
+  </div>
+<% end %>
 
 <br>
 
 <div>
-  <%= link_to "Show this category", @admin_category %> |
-  <%= link_to "Back to categories", admin_categories_path %>
+<%= link_to "Show this category", admin_category_path(@admin_category) %> | 
+<%= link_to "Back to categories", admin_categories_path %>
 </div>

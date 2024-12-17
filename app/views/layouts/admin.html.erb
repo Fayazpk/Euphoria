@@ -76,7 +76,7 @@
         </div>
         <nav class="nav flex-column">
             <%= link_to admin_dashboard_path, class: "nav-link" do %><i class="fas fa-chart-pie"></i>Dashboard<% end %>
-            <a class="nav-link" redirect_to admin_categories_path><i class="fas fa-box"></i> Products</a>
+            <%= link_to admin_products_path, class: "nav-link" do %><i class="fas fa-box"></i> Products<% end %>
             <%= link_to admin_categories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Categories<% end %>
             <%= link_to admin_subcategories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Subcategories<% end %>
             <a class="nav-link" href="#orders"><i class="fas fa-shopping-cart"></i> Orders</a>

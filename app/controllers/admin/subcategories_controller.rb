@@ -4,7 +4,7 @@ class Admin::SubcategoriesController < ApplicationController
 
   # GET /admin/subcategories or /admin/subcategories.json
   def index
-    @admin_subcategories = Subcategory.page(params[:page]).per(25)
+    @admin_subcategories = Subcategory.all
   end
 
   # GET /admin/subcategories/1 or /admin/subcategories/1.json
@@ -40,8 +40,8 @@ class Admin::SubcategoriesController < ApplicationController
   # PATCH/PUT /admin/subcategories/1 or /admin/subcategories/1.json
   def update
     respond_to do |format|
-      if @admin_subcategory.update(admin_subcategory_params)
-        format.html { redirect_to @admin_subcategory, notice: "Subcategory was successfully updated." }
+      if @admin_subcategory.update(subcategory_params)
+        format.html { redirect_to admin_subcategory_path(@admin_subcategory), notice: "Subcategory was successfully updated." }
         format.json { render :show, status: :ok, location: @admin_subcategory }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -70,10 +70,16 @@ class Admin::SubcategoriesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_subcategory
     @admin_subcategory = Subcategory.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to admin_subcategories_path, alert: "Subcategory not found."
   end
 
   # Only allow a list of trusted parameters through.
   def admin_subcategory_params
+    params.require(:subcategory).permit(:name, :description, :category_id, :image)
+  end
+
+  def subcategory_params
     params.require(:subcategory).permit(:name, :description, :category_id, :image)
   end
 end

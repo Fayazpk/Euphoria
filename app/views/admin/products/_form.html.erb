@@ -1,0 +1,80 @@
+<%= form_with(model: [:admin, @product], local: true) do |form| %>
+  <!-- Display Validation Errors -->
+  <% if @product.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h4>
+      <ul>
+        <% @product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Product Name -->
+  <div class="mb-3">
+    <%= form.label :name, "Product Name" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <!-- Base Price -->
+  <div class="mb-3">
+    <%= form.label :base_price, "Base Price" %>
+    <%= form.number_field :base_price, step: '0.01', required: true, class: "form-control" %>
+  </div>
+
+  <!-- Category -->
+  <div class="mb-3">
+    <%= form.label :category_id, "Category" %>
+    <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Select a category" }, class: "form-select" %>
+  </div>
+
+  <!-- Subcategory -->
+  <div class="mb-3">
+    <%= form.label :subcategory_id, "Subcategory" %>
+    <%= form.collection_select :subcategory_id, Subcategory.all, :id, :name, { prompt: "Select a subcategory" }, class: "form-select" %>
+  </div>
+
+  <!-- Size -->
+  <div class="mb-3">
+    <%= form.label :size_id, "Size" %>
+    <%= form.collection_select :size_id, Size.all, :id, :size, { prompt: "Select a size" }, class: "form-select" %>
+  </div>
+
+  <!-- Images -->
+  <div class="mb-3">
+    <%= form.label :images, "Product Images" %>
+    <%= form.file_field :images, multiple: true, class: "form-control" %>
+  </div>
+
+  <!-- Discount Fields (Nested Form) -->
+  <%= form.fields_for :discount do |discount_form| %>
+    <div class="mb-3">
+      <%= discount_form.label :discount_percentage, "Discount Percentage" %>
+      <%= discount_form.number_field :discount_percentage, step: 0.1, class: "form-control" %>
+    </div>
+  <% end %>
+   <!-- Base Price -->
+  <div class="mb-3">
+    <%= form.label :base_price, "Base Price" %>
+    <%= form.number_field :base_price, step: '0.01', required: true, class: "form-control" %>
+  </div>
+
+  <!-- Discount -->
+  <%= form.fields_for :discounts do |discount_form| %>
+    <div class="mb-3">
+      <%= discount_form.label :discount_percentage, "Discount Percentage" %>
+      <%= discount_form.number_field :discount_percentage, class: "form-control", step: 0.1 %>
+    </div>
+  <% end %>
+
+
+
+  <!-- Submit Button -->
+  <div class="mb-3">
+    <%= form.submit "Save Product", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+
+ 

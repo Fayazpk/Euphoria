@@ -20,14 +20,19 @@ Rails.application.routes.draw do
   namespace :usermodule do
     resources :home, only: [:index]
     resources :categories, only: [:index, :show] do
-      resources :subcategories, only: [:index]
+      resources :subcategories, only: [:index] do
+        resources :products, only: [:index]
+      end
     end
   end
 
   # Admin namespace
   namespace :admin do
-    resources :subcategories
+    resources :products do
+      get :subcategories, on: :collection
+    end
     resources :categories
+    resources :subcategories
     get 'dashboard', to: 'dashboard#index'
   end
 

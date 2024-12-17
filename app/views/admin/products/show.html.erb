@@ -1,0 +1,10 @@
+<div class="container mt-4">
+  <h1>Product Details</h1>
+  
+  <%= render @product %>  <!-- Changed from @admin_product -->
+  
+  <div class="mt-3">
+    <%= link_to "Edit", edit_admin_product_path(@product), class: "btn btn-primary" %>  <!-- Changed from @admin_product -->
+    <%= link_to "Back", admin_products_path, class: "btn btn-secondary" %>
+  </div>
+</div>

@@ -7,3 +7,9 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+Size.create([
+    { size: 'S' },
+    { size: 'M' },
+    { size: 'L' },
+    { size: 'XL' }
+])

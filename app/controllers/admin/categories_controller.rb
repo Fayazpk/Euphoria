@@ -63,6 +63,8 @@ class Admin::CategoriesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_category
     @admin_category = Category.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to admin_categories_path, alert: "Category not found."
   end
 
   # Only allow a list of trusted parameters through.

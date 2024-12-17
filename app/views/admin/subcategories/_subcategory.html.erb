@@ -15,7 +15,7 @@
   </p>
 <p>
   <% if subcategory.image.attached? %>
-  <%= image_tag subcategory.image, class: "subcategory-image", alt: subcategory.name %>
+  <%= image_tag subcategory.image, class: "subcategory-image", alt: subcategory.name , style: "width: 200px; height: 150px;" %>
 <% else %>
   <img src="https://placehold.co/400x500" alt="<%= subcategory.name %>" class="subcategory-image">
 <% end %>

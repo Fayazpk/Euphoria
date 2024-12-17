@@ -1,4 +1,4 @@
-<%= form_with(model: @admin_category, url: admin_categories_path, local: true) do |form| %>
+<%= form_with(model: @admin_category, local: true) do |form| %>
   <% if @admin_category.errors.any? %>
     <div class="alert alert-danger">
       <h4><%= pluralize(@admin_category.errors.count, "error") %> prohibited this category from being saved:</h4>
@@ -19,10 +19,11 @@
     <%= form.label :description, class: "form-label" %>
     <%= form.text_area :description, class: "form-control", placeholder: "Enter category description" %>
   </div>
-  <div class="form-group mb-3">
-              <%= form.label :image, "category Image", class: "form-label" %>
-              <%= form.file_field :image, class: "form-control" %>
-            </div>
+
+  <div class="mb-3">
+    <%= form.label :image, "Category Image", class: "form-label" %>
+    <%= form.file_field :image, class: "form-control" %>
+  </div>
 
   <div class="mb-3 text-end">
     <%= form.submit "Save Category", class: "btn btn-primary" %>
