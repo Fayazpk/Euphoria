@@ -8,15 +8,18 @@ class Admin::ProductsController < ApplicationController
 
   def show
     @product = Product.find(params[:id])
+   
+
     
   end
 
   def new
+    
     @product = Product.new
     @product.build_discount
+    @product.product_variants.build
     @categories = Category.all
     @subcategories = Subcategory.all
-    @sizes = Size.all
   end
 
   def create
@@ -27,15 +30,20 @@ class Admin::ProductsController < ApplicationController
     else
       @categories = Category.all
       @subcategories = Subcategory.all
-      @sizes = Size.all
       render :new
     end
   end
 
   def edit
+    @product = Product.find_by(id: params[:id])
+    if @product.nil?
+      redirect_to admin_products_path, alert: "Product not found."
+      return
+    end
+  
     @categories = Category.all
     @subcategories = Subcategory.all
-    @sizes = Size.all
+    @product.product_variants.build if @product.product_variants.empty?
   end
 
   def update
@@ -47,13 +55,8 @@ class Admin::ProductsController < ApplicationController
   end
 
   def destroy
-    @product = Product.find(params[:id])
-    # Add dependent: :destroy to the discounts association in the Product model
-    if @product.destroy
-      redirect_to admin_products_path, notice: 'Product was successfully deleted.'
-    else
-      redirect_to admin_products_path, alert: 'Failed to delete product.'
-    end
+    @product.destroy
+    redirect_to admin_products_path, notice: "Product was successfully destroyed."
   end
 
   private
@@ -69,9 +72,9 @@ class Admin::ProductsController < ApplicationController
       :base_price,
       :category_id,
       :subcategory_id,
-      :size_id,
       images: [],
-      discount_attributes: [:discount_percentage]
+      discount_attributes: [:discount_percentage],
+      product_variants_attributes: [:id, :size, :stock, :_destroy]
     )
   end
 end

@@ -1,7 +1,108 @@
-<div class="card">
-  <img src="img_avatar.png" alt="Avatar" style="width:100%">
-  <div class="container">
-    <h4><b>John Doe</b></h4>
-    <p>Architect & Engineer</p>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections | <%= @subcategory.name %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            perspective: 1000px;
+        }
+        .product-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .discount-badge {
+            background: linear-gradient(to right, #ff6b6b, #ff9900);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <a href="/collections" class="ml-1 text-sm text-gray-700 hover:text-gray-900 md:ml-2">Collections</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2"><%= @subcategory.name %></span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Page Title -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-8"><%= @subcategory.name %> Collection</h2>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <% @products.each do |product| %>
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105">
+                    <div class="relative">
+                        <% if product.images.any? %>
+                            <%= image_tag(product.images.first, class: "w-full h-72 object-cover") %>
+                        <% else %>
+                            <div class="w-full h-72 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-6xl"></i>
+                            </div>
+                        <% end %>
+                        
+                        <!-- Discount Badge -->
+                        <div class="absolute top-4 right-4 discount-badge text-white px-3 py-1 rounded-full text-sm font-bold">
+                            <%= product.discount.discount_percentage %>% OFF
+                        </div>
+                        
+                        <!-- Wishlist Icon -->
+                        <button class="absolute top-4 left-4 bg-white rounded-full w-10 h-10 flex items-center justify-center  shadow-md">
+                            <i class="far fa-heart text-gray-600"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2"><%= product.name %></h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2"><%= product.description %></p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>                                
+                                <div class="flex items-center">
+                                    <span class="text-xl font-bold text-gray-900 mr-3">
+                                        $<%= product.final_price %>
+                                    </span>
+                                    <span class="line-through text-gray-400 text-sm">
+                                        $<%= product.base_price %>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">
+                                Add to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    </div>
+</body>
+</html>

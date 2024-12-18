@@ -5,6 +5,7 @@ class Usermodule::ProductsController < ApplicationController
         @subcategory = category.subcategories.find_by(id: params[:subcategory_id])
         if @subcategory
           @products = @subcategory.products
+          
         else
           flash[:alert] = "Subcategory not found for the given category."
           redirect_to categories_path

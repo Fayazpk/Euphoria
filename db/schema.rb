@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_17_043439) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_17_144310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,18 +79,26 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_043439) do
     t.index ["product_id"], name: "index_discounts_on_product_id"
   end
 
+  create_table "product_variants", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.string "variant_name"
+    t.integer "stock"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "size"
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.bigint "category_id", null: false
     t.bigint "subcategory_id", null: false
-    t.bigint "size_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "base_price", precision: 10, scale: 2, default: "0.0", null: false
     t.decimal "discount_percentage", precision: 5, scale: 2, default: "0.0"
     t.index ["category_id"], name: "index_products_on_category_id"
-    t.index ["size_id"], name: "index_products_on_size_id"
     t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
   end
 
@@ -126,8 +134,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_043439) do
   add_foreign_key "admin_products", "subcategories"
   add_foreign_key "admin_subcategories", "categories"
   add_foreign_key "discounts", "products"
+  add_foreign_key "product_variants", "products"
   add_foreign_key "products", "categories"
-  add_foreign_key "products", "sizes"
   add_foreign_key "products", "subcategories"
   add_foreign_key "subcategories", "categories"
 end

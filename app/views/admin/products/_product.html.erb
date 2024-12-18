@@ -1,12 +1,39 @@
 <div id="<%= dom_id(@product) %>">
-  <p><strong>Name:</strong> <%= @product.name %></p>
-  <p><strong>Description:</strong> <%= @product.description %></p>
-  <p><strong>Category:</strong> <%= @product.category&.name || "N/A" %></p>
-  <p><strong>Subcategory:</strong> <%= @product.subcategory&.name || "N/A" %></p>
-  <p><strong>Size:</strong> <%= @product.size&.size || "N/A" %></p>
-  <p><strong>Base Price:</strong> <%= number_to_currency(@product.base_price) %></p>
-  <p><strong>Discount Percentage:</strong> <%= @product.discount&.discount_percentage || 0 %>%</p>
-  <p><strong>Final Price:</strong> <%= number_to_currency(@product.final_price) %></p>
+  <div class="product-details">
+    <p><strong>Name:</strong> <%= @product.name %></p>
+    <p><strong>Description:</strong> <%= @product.description %></p>
+    <p><strong>Category:</strong> <%= @product.category&.name || "N/A" %></p>
+    <p><strong>Subcategory:</strong> <%= @product.subcategory&.name || "N/A" %></p>
+    
+    <%# Show sizes from product variants %>
+    <p><strong>Sizes:</strong> 
+      <% if @product.product_variants.any? %>
+        <%= @product.product_variants.map(&:size).join(", ") %>
+      <% else %>
+        N/A
+      <% end %>
+    </p>
+
+    <p><strong>Stock:</strong> 
+      <% if @product.product_variants.any? %>
+        <%= @product.product_variants.map(&:stock).join(", ") %>
+      <% else %>
+        N/A
+      <% end %>
+    </p>
+    
+    <p><strong>Base Price:</strong> <%= number_to_currency(@product.base_price) %></p>
+    <p><strong>Discount Percentage:</strong> <%= @product.discount&.discount_percentage || 0 %>%</p>
+    <p><strong>Final Price:</strong> <%= number_to_currency(@product.final_price) %></p>
+  </div>
+
+  <h3>Variants</h3>
+  <% @product.product_variants.each do |variant| %>
+    <p><strong>Size:</strong> <%= variant.size.capitalize %></p>
+    <p><strong>Stock:</strong> <%= variant.stock %></p>
+    <p><strong>Out of Stock?</strong> <%= variant.out_of_stock? ? 'Yes' : 'No' %></p>
+    <hr>
+  <% end %>
 
   <% @product.images.each do |image| %>
     <%= image_tag image, width: 100, height: 100 %>

@@ -35,12 +35,6 @@
     <%= form.collection_select :subcategory_id, Subcategory.all, :id, :name, { prompt: "Select a subcategory" }, class: "form-select" %>
   </div>
 
-  <!-- Size -->
-  <div class="mb-3">
-    <%= form.label :size_id, "Size" %>
-    <%= form.collection_select :size_id, Size.all, :id, :size, { prompt: "Select a size" }, class: "form-select" %>
-  </div>
-
   <!-- Images -->
   <div class="mb-3">
     <%= form.label :images, "Product Images" %>
@@ -54,27 +48,31 @@
       <%= discount_form.number_field :discount_percentage, step: 0.1, class: "form-control" %>
     </div>
   <% end %>
-   <!-- Base Price -->
-  <div class="mb-3">
-    <%= form.label :base_price, "Base Price" %>
-    <%= form.number_field :base_price, step: '0.01', required: true, class: "form-control" %>
-  </div>
 
-  <!-- Discount -->
-  <%= form.fields_for :discounts do |discount_form| %>
-    <div class="mb-3">
-      <%= discount_form.label :discount_percentage, "Discount Percentage" %>
-      <%= discount_form.number_field :discount_percentage, class: "form-control", step: 0.1 %>
+  <!-- Product Variants (Nested Form for Sizes and Stock) -->
+  <h4>Product Variants</h4>
+  <%= form.fields_for :product_variants do |variant_form| %>
+    <div class="variant-fields mb-3">
+      <!-- Variant Size -->
+      <div class="mb-3">
+        <%= variant_form.label :size, "Size" %>
+        <%= variant_form.select :size, ProductVariant.sizes.keys.map { |size| [size.capitalize, size] }, { prompt: "Select a size" }, class: "form-select" %>
+      </div>
+
+      <!-- Variant Stock -->
+      <div class="mb-3">
+        <%= variant_form.label :stock, "Stock" %>
+        <%= variant_form.number_field :stock, step: '1', class: "form-control" %>
+      </div>
+
+      <%= link_to_remove_association "Remove Variant", variant_form, class: "btn btn-danger" %>
     </div>
   <% end %>
 
-
+  <%= link_to_add_association "Add Variant", form, :product_variants, class: "btn btn-success mb-3" %>
 
   <!-- Submit Button -->
   <div class="mb-3">
     <%= form.submit "Save Product", class: "btn btn-primary" %>
   </div>
 <% end %>
-
-
- 
