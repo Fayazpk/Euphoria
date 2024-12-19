@@ -1,0 +1,42 @@
+<!--Footer--!>
+<!-- app/views/shared/_footer.html.erb -->
+<footer class="bg-gray-900 text-white py-16">
+    <div class="container mx-auto px-4 grid md:grid-cols-4 gap-8">
+        <div>
+            <h4 class="text-xl font-bold mb-4 text-white">Dress Collective</h4>
+            <p class="text-gray-400">Curating fashion experiences that inspire and empower.</p>
+        </div>
+        <div>
+            <h4 class="font-bold mb-4 text-white">Quick Navigation</h4>
+            <ul class="space-y-2">
+            <li><%= link_to "Home", root_path, class: "text-gray-300 hover:text-white" %></li>
+            <li><%= link_to "Collections", "#", class: "text-gray-300 hover:text-white" %></li>
+            <li><%= link_to "New Arrivals", "#", class: "text-gray-300 hover:text-white" %></li>
+            
+            </ul>
+        </div>
+        <div>
+            <h4 class="font-bold mb-4 text-white">Customer Care</h4>
+            <ul class="space-y-2">
+            <li><%= link_to "Size Guide", "#", class: "text-gray-300 hover:text-white" %></li>
+            <li><%= link_to "Shipping", "#", class: "text-gray-300 hover:text-white" %></li>
+            <li><%= link_to "Returns", "#", class: "text-gray-300 hover:text-white" %></li>
+            
+            </ul>
+        </div>
+        <div>
+            <h4 class="font-bold mb-4 text-white">Connect</h4>
+            <div class="flex space-x-4">
+                <%= link_to "https://instagram.com/dresscollective", target: "_blank", class: "text-gray-300 hover:text-white" do %>
+                    <i class="fab fa-instagram text-2xl"></i>
+                <% end %>
+                <%= link_to "https://pinterest.com/dresscollective", target: "_blank", class: "text-gray-300 hover:text-white" do %>
+                    <i class="fab fa-pinterest text-2xl"></i>
+                <% end %>
+                <%= link_to "https://twitter.com/dresscollective", target: "_blank", class: "text-gray-300 hover:text-white" do %>
+                    <i class="fab fa-twitter text-2xl"></i>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</footer>

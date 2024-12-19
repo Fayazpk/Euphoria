@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .mega-menu {
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .group:hover .mega-menu {
+            display: block;
+        }
+        .search-bar {
+            transition: width 0.3s ease;
+        }
+        .search-bar:focus {
+            width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="bg-gray-900 text-white py-2">
+        <div class="container mx-auto px-4 flex justify-between items-center text-sm">
+            <div class="flex items-center space-x-4">
+                <a href="tel:+1234567890" class="hover:text-gray-300">
+                    <i class="fas fa-phone mr-2"></i>+1 (234) 567-890
+                </a>
+                <a href="mailto:support@example.com" class="hover:text-gray-300">
+                    <i class="fas fa-envelope mr-2"></i>support@example.com
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-gray-300">Track Order</a>
+                <a href="#" class="hover:text-gray-300">Store Locator</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2">
+                    <img src="/logo.png" alt="Logo" class="h-12 w-auto">
+                    <span class="text-2xl font-bold text-gray-800">YourBrand</span>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="hidden md:block flex-1 max-w-xl px-6">
+                    <div class="relative">
+                        <input type="search" 
+                               placeholder="Search for products..." 
+                               class="search-bar w-full px-4 py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500">
+                        <div class="absolute left-3 top-2.5 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="flex items-center space-x-6">
+                    <!-- User Account -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 hover:text-blue-600">
+                            <i class="far fa-user text-xl"></i>
+                            <span class="hidden md:inline">Account</span>
+                        </button>
+                        <div class="absolute right-0 w-48 py-2 bg-white rounded-md shadow-xl mega-menu">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign In</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Register</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">My Orders</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Wishlist</a>
+                        </div>
+                    </div>
+
+                    <!-- Wishlist -->
+                    <a href="#" class="flex items-center space-x-1 hover:text-blue-600">
+                        <div class="relative">
+                            <i class="far fa-heart text-xl"></i>
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
+                        </div>
+                        <span class="hidden md:inline">Wishlist</span>
+                    </a>
+
+                    <!-- Cart -->
+                    <a href="#" class="flex items-center space-x-1 hover:text-blue-600">
+                        <div class="relative">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span class="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
+                        </div>
+                        <span class="hidden md:inline">Cart</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Categories Menu -->
+            <div class="border-t">
+                <div class="flex justify-between items-center h-12">
+                    <div class="flex space-x-8">
+                        <% Category.all.each do |category| %>
+                            <div class="relative group">
+                                <button class="flex items-center space-x-1 h-12 px-2 hover:text-blue-600">
+                                    <span><%= category.name %></span>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </button>
+                                <div class="absolute left-0 w-64 mt-0 py-2 bg-white rounded-b-md shadow-xl mega-menu">
+                                    <% category.subcategories.each do |subcategory| %>
+                                        <%= link_to usermodule_category_subcategory_products_path(category, subcategory), 
+                                            class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" do %>
+                                            <%= subcategory.name %>
+                                        <% end %>
+                                    <% end %>
+                                </div>
+                            </div>
+                        <% end %>
+                    </div>
+                    <!-- Special Offers -->
+                    <a href="#" class="flex items-center space-x-2 text-red-600 hover:text-red-700">
+                        <i class="fas fa-tag"></i>
+                        <span>Special Offers</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Search (shows only on mobile) -->
+    <div class="md:hidden px-4 py-3 bg-gray-50">
+        <div class="relative">
+            <input type="search" 
+                   placeholder="Search for products..." 
+                   class="w-full px-4 py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500">
+            <div class="absolute left-3 top-2.5 text-gray-400">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

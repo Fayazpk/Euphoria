@@ -5,6 +5,7 @@ module Usermodule
     def index
       Rails.logger.info("User home page accessed")
       @categories = Category.all
+      @product = Product.all
     end
   end
 end 

@@ -12,87 +12,134 @@
     </div>
   <% end %>
 
+  <!-- Product Name -->
   <div class="form-group">
     <%= form.label :name, "Product Name", class: "form-label" %>
     <%= form.text_field :name, class: "form-control", placeholder: "Enter product name" %>
   </div>
 
+  <!-- Product Description -->
   <div class="form-group">
     <%= form.label :description, "Description", class: "form-label" %>
     <%= form.text_area :description, class: "form-control", placeholder: "Enter product description" %>
   </div>
 
+  <!-- Category Selection -->
   <div class="form-group">
     <%= form.label :category_id, "Category", class: "form-label" %>
     <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Select a Category" }, class: "form-control" %>
   </div>
 
+  <!-- Subcategory Selection -->
   <div class="form-group">
     <%= form.label :subcategory_id, "Subcategory", class: "form-label" %>
     <%= form.collection_select :subcategory_id, @subcategories, :id, :name, { prompt: "Select a Subcategory" }, class: "form-control" %>
   </div>
 
-  <%= form.fields_for :product_variants do |variant_fields| %>
-    <div class="form-group">
-      <%= variant_fields.label :size, class: "form-label" %>
-      <%= variant_fields.select :size, ProductVariant.sizes.keys.map { |size| [size.capitalize, size] }, class: "form-control" %>
-    </div>
-    <div class="form-group">
-      <%= variant_fields.label :stock %>
-      <%= variant_fields.number_field :stock, class: "form-control" %>
-    </div>
-  <% end %>
+  <div class="form-group">
+  <label for="product_variants">Product Variants</label>
+  <div id="variants-container">
+    <!-- Existing or pre-built variant rows -->
+    <%= form.fields_for :product_variants do |variant_form| %>
+      <div class="variant-row d-flex align-items-center mb-2">
+        <%= variant_form.label :size, "Size", class: "form-label" %>
+        <%= variant_form.select :size, ProductVariant.sizes.keys.map { |size| [size.capitalize, size] }, {}, class: "form-control me-2", required: true %>
 
+        <%= variant_form.label :stock, "Stock", class: "form-label" %>
+        <%= variant_form.number_field :stock, class: "form-control me-2", required: true %>
+
+        <%= variant_form.hidden_field :_destroy %>
+        <button type="button" class="btn btn-danger remove-variant-btn">Remove</button>
+      </div>
+    <% end %>
+  </div>
+
+  <button type="button" id="add-variant-btn" class="btn btn-secondary mt-2">Add Variant</button>
+</div>
+
+  <!-- Base Price -->
   <div class="form-group">
     <%= form.label :base_price, "Base Price", class: "form-label" %>
     <%= form.number_field :base_price, step: 0.01, class: "form-control", placeholder: "Enter base price", id: "base_price" %>
   </div>
 
+  <!-- Discount Percentage -->
   <div class="form-group">
-    <%= form.fields_for :discount do |discount_form| %>
-      <%= discount_form.label :discount_percentage, "Discount Percentage", class: "form-label" %>
-      <%= discount_form.number_field :discount_percentage, 
-            value: @product.discount&.discount_percentage || "", 
-            class: "form-control", 
-            step: 0.01, 
-            placeholder: "Enter discount percentage", 
-            id: "discount_percentage" %>
-    <% end %>
+    <%= form.label :discount_percentage, "Discount Percentage", class: "form-label" %>
+    <%= form.number_field :discount_percentage, value: @product.discount_percentage || "", class: "form-control", step: 0.01, placeholder: "Enter discount percentage", id: "discount_percentage" %>
   </div>
 
+  <!-- Final Price -->
   <div class="form-group">
     <label>Final Price</label>
     <input type="text" class="form-control" id="final_price" readonly>
   </div>
 
+  <!-- Product Images -->
   <div class="form-group">
     <%= form.label :images, "Product Images", class: "form-label" %>
     <%= form.file_field :images, multiple: true, class: "form-control" %>
     <small class="form-text text-muted">Upload up to four images for the product.</small>
   </div>
 
+  <!-- Submit Button -->
   <div class="form-group">
     <%= form.submit "Create Product", class: "btn btn-primary" %>
   </div>
 <% end %>
 
+<!-- JavaScript for Dynamic Variant Fields -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
+    const variantsContainer = document.getElementById("variants-container");
+    const addVariantButton = document.getElementById("add-variant-btn");
+
+    // Add new variant row when the button is clicked
+    addVariantButton.addEventListener("click", function() {
+      const variantRow = document.createElement("div");
+      variantRow.classList.add("variant-row", "d-flex", "align-items-center", "mb-2");
+
+      variantRow.innerHTML = `
+        <select name="product[variants_attributes][][size]" class="form-control me-2" required>
+          <option value="s">S</option>
+          <option value="m">M</option>
+          <option value="l">L</option>
+          <option value="xl">XL</option>
+        </select>
+        <input type="number" name="product[variants_attributes][][stock]" placeholder="Stock" class="form-control me-2" required>
+        <button type="button" class="btn btn-danger remove-variant-btn">Remove</button>
+      `;
+
+      // Append the new variant row to the container
+      variantsContainer.appendChild(variantRow);
+
+      // Attach event listener to remove button
+      variantRow.querySelector(".remove-variant-btn").addEventListener("click", function() {
+        variantRow.remove();
+      });
+    });
+
+    // Attach event listener to initial remove button
+    variantsContainer.querySelector(".remove-variant-btn").addEventListener("click", function(event) {
+      event.target.closest(".variant-row").remove();
+    });
+  });
+
+  // JavaScript for Final Price Calculation
+  document.addEventListener("DOMContentLoaded", function() {
     const basePriceInput = document.getElementById("base_price");
-    const discountPercentageInput = document.getElementById("discount_percentage");
+    const discountInput = document.getElementById("discount_percentage");
     const finalPriceInput = document.getElementById("final_price");
 
+    // Calculate and display final price based on base price and discount percentage
     function calculateFinalPrice() {
       const basePrice = parseFloat(basePriceInput.value) || 0;
-      const discountPercentage = parseFloat(discountPercentageInput.value) || 0;
-
-      const discountAmount = (basePrice * (discountPercentage / 100));
-      const finalPrice = basePrice - discountAmount;
-
-      finalPriceInput.value = finalPrice.toFixed(2); // Format to 2 decimal places
+      const discountPercentage = parseFloat(discountInput.value) || 0;
+      const finalPrice = basePrice - (basePrice * (discountPercentage / 100));
+      finalPriceInput.value = finalPrice.toFixed(2); // Format the price to 2 decimal places
     }
 
     basePriceInput.addEventListener("input", calculateFinalPrice);
-    discountPercentageInput.addEventListener("input", calculateFinalPrice);
+    discountInput.addEventListener("input", calculateFinalPrice);
   });
 </script>

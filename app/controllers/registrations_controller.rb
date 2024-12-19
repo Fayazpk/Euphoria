@@ -1,6 +1,6 @@
 class RegistrationsController < ApplicationController
+  before_action :redirect_if_authenticated
   before_action :find_user, only: [:verify_otp, :verify_otp_submission]
-
   def new
     @user = User.new
   end
@@ -21,31 +21,37 @@ class RegistrationsController < ApplicationController
   end
 
   def verify_otp
-    # Ensure params[:user] is present
-    if params[:user].nil?
-      flash[:alert] = "OTP submission is missing."
-      render :verify_otp and return
+    if request.post?
+      # Handle OTP verification
+      submitted_otp = params[:user][:otp]
+      
+      if submitted_otp.blank?
+        flash[:alert] = "OTP cannot be blank."
+        return render :verify_otp
+      end
+    
+      if @user.otp_code == submitted_otp && @user.otp_expires_at > Time.current
+        @user.update(verified: true)
+        flash[:notice] = "OTP verified successfully!"
+        return redirect_to usermodule_home_index_path
+      else
+        flash[:alert] = "Invalid or expired OTP."
+        return render :verify_otp
+      end
     end
-  
-    submitted_otp = params[:user][:otp]  # Access OTP from params[:user][:otp]
-  
-    if submitted_otp.blank?
-      flash[:alert] = "OTP cannot be blank."
-      render :verify_otp and return
-    end
-  
-    if @user.otp_code == submitted_otp && @user.otp_expires_at > Time.current
-      flash[:notice] = "OTP verified successfully!"
-      redirect_to usermodule_home_index_path  # Replace with your desired path
-    else
-      flash[:alert] = "Invalid or expired OTP."
-      Rails.logger.debug { "Expected OTP: #{@user.otp_code}, Submitted OTP: #{submitted_otp}" }
-      Rails.logger.debug { "OTP Expiration: #{@user.otp_expires_at}" }
-      render :verify_otp
-    end
+    # GET request will just render the form
   end
-  
-  
+  def resend_otp
+    if @user
+      @user.generate_otp
+      UserMailer.send_otp(@user).deliver_now
+      flash[:notice] = "New OTP has been sent to your email."
+    else
+      flash[:alert] = "User not found."
+    end
+    redirect_to verify_otp_registration_path(@user.id)
+  end
+
 
   private
 
@@ -59,5 +65,9 @@ class RegistrationsController < ApplicationController
 
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation)
+  end
+  def redirect_if_authenticated
+    # Ensure users can't access the login or OAuth request pages if they're already logged in
+    redirect_to usermodule_home_index_path, notice: "You are already logged in." if user_signed_in? && !request.path.include?("/auth/")
   end
 end

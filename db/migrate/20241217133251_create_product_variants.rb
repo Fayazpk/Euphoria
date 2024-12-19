@@ -7,5 +7,8 @@ class CreateProductVariants < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
+
+    # Add an index for better query performance
+    add_index :product_variants, [:product_id, :size], unique: true
   end
 end

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     member do
       get 'verify_otp'
       post 'verify_otp'
+      post :resend_otp
     end
   end
 
@@ -21,14 +22,16 @@ Rails.application.routes.draw do
     resources :home, only: [:index]
     resources :categories, only: [:index, :show] do
       resources :subcategories, only: [:index] do
-        resources :products, only: [:index]
+        resources :products, only: [:index, :show] do
+          resources :productviews, only: [:index] 
+        end
       end
     end
   end
 
   # Admin namespace
   namespace :admin do
-    resources :products do
+      resources :products do
       get :subcategories, on: :collection
     end
     resources :categories

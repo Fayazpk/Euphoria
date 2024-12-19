@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections | <%= @subcategory.name %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .image-gallery img {
+            transition: all 0.3s ease;
+        }
+        .image-gallery img:hover {
+            transform: scale(1.05);
+        }
+        .discount-badge {
+            background: linear-gradient(to right, #ff6b6b, #ff9900);
+        }
+        .zoom-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .zoom-lens {
+            position: absolute;
+            border: 2px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.4);
+            cursor: crosshair;
+            display: none;
+        }
+        .zoom-result {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            display: none;
+            z-index: 999;
+            overflow: hidden;
+            margin-left: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .selected-thumbnail {
+            border: 2px solid #2563eb;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <!-- Rest of the breadcrumb items -->
+            </ol>
+        </nav>
+
+        <!-- Page Title -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-8"><%= @product.name %></h2>
+
+        <!-- Product Details Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Left Column - Image Gallery -->
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="zoom-container">
+                        <div class="zoom-lens"></div>
+                        <div class="zoom-result"></div>
+                        <% if @product.images.any? %>
+                            <%= image_tag(@product.images.first, 
+                                class: "w-full h-96 object-cover rounded-lg main-image", 
+                                id: "mainImage",
+                                data: { 
+                                    original: @product.images.first
+                                }
+                            ) %>
+                        <% else %>
+                            <div class="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
+                                <i class="fas fa-image text-gray-400 text-6xl"></i>
+                            </div>
+                        <% end %>
+                    </div>
+                </div>
+                
+                <!-- Thumbnail Gallery -->
+                <div class="grid grid-cols-4 gap-2 image-gallery" id="thumbnailGallery">
+                    <% @product.images.each_with_index do |image, index| %>
+                        <%= image_tag(image, 
+                            class: "w-full h-24 object-cover rounded-lg cursor-pointer thumbnail-image #{index == 0 ? 'selected-thumbnail' : ''}", 
+                            data: { 
+                                index: index,
+                                original: image
+                            }
+                        ) %>
+                    <% end %>
+                </div>
+            </div>
+
+            <!-- Right Column - Product Info -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <!-- Product Info Content Same as Previous -->
+                <div class="flex justify-between items-start mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800"><%= @product.name %></h1>
+                    <button class="bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md">
+                        <i class="far fa-heart text-gray-600"></i>
+                    </button>
+                </div>
+
+                <!-- Price Section -->
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl font-bold text-gray-900 mr-4">$<%= @product.final_price %></span>
+                    <span class="line-through text-gray-400 text-xl">$<%= @product.base_price %></span>
+                    <span class="discount-badge ml-4 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        <%= @product.discount_percentage %>% OFF
+                    </span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold mb-2">Description</h2>
+                    <p class="text-gray-600"><%= @product.description %></p>
+                </div>
+
+                <!-- Variants -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold mb-2">Size Options</h2>
+                    <div class="flex flex-wrap gap-3">
+                        <% @variant.each do |variant| %>
+                            <div class="relative">
+                                <button 
+                                    class="min-w-[80px] px-4 py-2 rounded-lg font-medium
+                                        <%= variant.out_of_stock? ? 
+                                            'bg-gray-100 text-gray-400 cursor-not-allowed' : 
+                                            'bg-white text-gray-800 hover:bg-blue-50 border-2 border-blue-600 hover:border-blue-700 transition-all duration-300'
+                                        %>
+                                        relative overflow-hidden group"
+                                    <%= 'disabled' if variant.out_of_stock? %>
+                                >
+                                    <span class="block text-sm mb-1"><%= variant.size.capitalize %></span>
+                                    <% if variant.out_of_stock? %>
+                                        <span class="block text-xs text-red-500">Out of Stock</span>
+                                    <% else %>
+                                        <span class="block text-xs text-green-500">In Stock</span>
+                                    <% end %>
+                                </button>
+                            </div>
+                        <% end %>
+                    </div>
+                </div>
+
+
+                <!-- Category and Subcategory -->
+                <div class="bg-white shadow-sm rounded-lg p-4 mb-6">
+                <div class="flex flex-col space-y-2">
+                    <!-- Category -->
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                        <span class="text-lg font-medium text-gray-600">
+                            Category: <span class="text-gray-900"><%= @category.name %></span>
+                        </span>
+                    </div>
+                    
+                    <!-- Subcategory -->
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                        <span class="text-lg font-medium text-gray-600">
+                            Subcategory: <span class="text-gray-900"><%= @subcategory.name %></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Add to Cart Section -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center border rounded-md">
+                        <button class="px-4 py-2 text-gray-600 hover:bg-gray-100">-</button>
+                        <input type="number" value="1" min="1" class="w-16 text-center border-x py-2">
+                        <button class="px-4 py-2 text-gray-600 hover:bg-gray-100">+</button>
+                    </div>
+                    <button class="flex-grow bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-300">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Similaircollection -->
+    <section class="bg-gray-100 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">
+            SIMILAR PRODUCTS
+
+            </h2>
+            <div class="grid md:grid-cols-4 gap-6">
+            <% @related.each do |product| %>
+              <div class="bg-white rounded-lg shadow-md p-4 text-center product-card">
+                <% if product.images.attached? %>
+                  <%= image_tag product.images.first, class: "w-full rounded-lg mb-4" %>
+                <% else %>
+                  <img src="https://placehold.co/300x400" alt="Placeholder Image" class="w-full rounded-lg mb-4">
+                <% end %>
+                
+                <h3 class="font-semibold text-lg text-gray-800"><%= product.name %></h3>
+                <p class="text-gray-600 mt-2"><%= product.description %></p>
+                <div class="flex justify-between items-center mt-4">
+                  <span class="text-lg font-bold text-gray-900">$<%= product.final_price %></span>
+                  <span class="line-through text-gray-400 text-sm">$<%= product.base_price %>
+                                    </span>
+                  <button class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+    </section>
+          
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail-image');
+            const zoomContainer = document.querySelector('.zoom-container');
+            const zoomLens = document.querySelector('.zoom-lens');
+            const zoomResult = document.querySelector('.zoom-result');
+            
+            // Thumbnail clicking functionality
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    mainImage.src = this.src;
+                    mainImage.dataset.original = this.dataset.original;
+                    
+                    thumbnails.forEach(t => t.classList.remove('selected-thumbnail'));
+                    this.classList.add('selected-thumbnail');
+                });
+            });
+
+            // Zoom functionality
+            const ZOOM_LEVEL = 2;
+            
+            function setupZoom() {
+                const lensWidth = 100;
+                const lensHeight = 100;
+                
+                zoomLens.style.width = lensWidth + 'px';
+                zoomLens.style.height = lensHeight + 'px';
+                
+                mainImage.addEventListener('mouseenter', function() {
+                    zoomLens.style.display = 'block';
+                    zoomResult.style.display = 'block';
+                });
+
+                mainImage.addEventListener('mouseleave', function() {
+                    zoomLens.style.display = 'none';
+                    zoomResult.style.display = 'none';
+                });
+
+                mainImage.addEventListener('mousemove', function(e) {
+                    const rect = mainImage.getBoundingClientRect();
+                    const x = e.clientX - rect.left - lensWidth / 2;
+                    const y = e.clientY - rect.top - lensHeight / 2;
+                    
+                    const maxX = mainImage.offsetWidth - lensWidth;
+                    const maxY = mainImage.offsetHeight - lensHeight;
+                    
+                    const lensX = Math.min(Math.max(0, x), maxX);
+                    const lensY = Math.min(Math.max(0, y), maxY);
+                    
+                    zoomLens.style.left = lensX + 'px';
+                    zoomLens.style.top = lensY + 'px';
+                    
+                    zoomResult.style.backgroundImage = `url(${mainImage.src})`;
+                    zoomResult.style.backgroundSize = (mainImage.offsetWidth * ZOOM_LEVEL) + 'px ' + 
+                                                    (mainImage.offsetHeight * ZOOM_LEVEL) + 'px';
+                    zoomResult.style.backgroundPosition = `-${lensX * ZOOM_LEVEL}px -${lensY * ZOOM_LEVEL}px`;
+                });
+            }
+
+            setupZoom();
+            window.addEventListener('resize', setupZoom);
+        });
+    </script>
+</body>
+</html>
