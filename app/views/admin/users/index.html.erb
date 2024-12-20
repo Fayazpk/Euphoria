@@ -1,16 +1,155 @@
-<p style="color: green"><%= notice %></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            @apply px-3 py-1 rounded-full text-sm font-medium;
+        }
+        .status-active {
+            @apply bg-green-100 text-green-800;
+        }
+        .status-blocked {
+            @apply bg-red-100 text-red-800;
+        }
+        .user-table {
+            @apply shadow-md rounded-lg overflow-hidden;
+        }
+        .user-row {
+            @apply transition-all duration-200 hover:bg-gray-50;
+        }
+        .action-button {
+            @apply transition-colors duration-200;
+        }
+        
+        @media (max-width: 768px) {
+            .user-email {
+                @apply font-medium;
+            }
+            .created-at {
+                @apply text-sm text-gray-500;
+            }
+            .action-buttons {
+                @apply flex-col space-y-2;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container-fluid px-4 py-6">
+        <!-- Notice Message -->
+        <% if notice.present? %>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline"><%= notice %></span>
+            </div>
+        <% end %>
 
-<% content_for :title, "Users" %>
+        <!-- Header Section -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Users Management</h2>
+                <p class="text-gray-600 text-sm mt-1">Manage and monitor user accounts</p>
+            </div>
+            <%= link_to new_admin_user_path, class: "btn btn-primary flex items-center space-x-2" do %>
+                <i class="fas fa-user-plus"></i>
+                <span>Add New User</span>
+            <% end %>
+        </div>
 
-<h1>Users</h1>
+        <% if @users.present? %>
+            <div class="user-table bg-white">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-100 border-b">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider hidden md:table-cell">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider hidden lg:table-cell">Joined Date</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <% @users.each do |admin_user| %>
+                                <tr class="user-row">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                    <i class="fas fa-user text-gray-500"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="user-email text-sm font-medium text-gray-900">
+                                                    <%= admin_user.email %>
+                                                </div>
+                                                <div class="md:hidden">
+                                                    <span class="status-badge <%= admin_user.is_blocked ? 'status-blocked' : 'status-active' %>">
+                                                        <%= admin_user.is_blocked ? 'Blocked' : 'Active' %>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden md:table-cell">
+                                        <span class="status-badge <%= admin_user.is_blocked ? 'status-blocked' : 'status-active' %>">
+                                            <%= admin_user.is_blocked ? 'Blocked' : 'Active' %>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 hidden lg:table-cell">
+                                        <div class="text-sm text-gray-600">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <%= admin_user.created_at.strftime("%B %d, %Y") %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex justify-end space-x-2">
+                                            <%= link_to admin_user_path(admin_user), 
+                                                class: "action-button p-2 rounded-full hover:bg-blue-50 text-blue-600" do %>
+                                                <i class="fas fa-eye"></i>
+                                            <% end %>
+                                            
+                                            <%= link_to edit_admin_user_path(admin_user), 
+                                                class: "action-button p-2 rounded-full hover:bg-yellow-50 text-yellow-600" do %>
+                                                <i class="fas fa-edit"></i>
+                                            <% end %>
+                                            
+                                            <%= button_to admin_user_path(admin_user), 
+                                                method: :delete,
+                                                class: "action-button p-2 rounded-full hover:bg-red-50 text-red-600",
+                                                data: { confirm: "Are you sure you want to delete this user?" } do %>
+                                                <i class="fas fa-trash"></i>
+                                            <% end %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
 
-<div id="admin_users">
-  <% @admin_users.each do |admin_user| %>
-    <%= render admin_user %>
-    <p>
-      <%= link_to "Show this user", admin_user %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New user", new_admin_user_path %>
+                <!-- Pagination -->
+                
+        <% else %>
+            <!-- Empty State -->
+            <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="rounded-full bg-gray-100 p-6">
+                        <i class="fas fa-users text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No Users Found</h3>
+                <p class="text-gray-500 mb-4">Get started by adding your first user to the system.</p>
+                <%= link_to new_admin_user_path, class: "btn btn-primary" do %>
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Add First User
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+</body>
+</html>

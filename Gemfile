@@ -54,12 +54,13 @@ group :development, :test do
     gem 'dotenv-rails'
     gem 'mail'
     gem 'letter_opener'
+    gem 'omniauth'
     gem 'omniauth-google-oauth2'
+    gem 'omniauth-rails_csrf_protection'  # Important for security
     gem 'google-cloud-storage'
     gem 'kaminari'
     gem 'cocoon', '~> 1.2', '>= 1.2.15'
     gem 'pry', '~> 0.14.2'
-
 
 
   end

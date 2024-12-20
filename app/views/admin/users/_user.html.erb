@@ -1,17 +1,21 @@
-<div id="<%= dom_id user %>">
-  <p>
-    <strong>Email:</strong>
-    <%= user.email %>
-  </p>
-
-  <p>
-    <strong>Password digest:</strong>
-    <%= user.password_digest %>
-  </p>
-
-  <p>
-    <strong>Is blocked:</strong>
-    <%= user.is_blocked %>
-  </p>
-
+<%# app/views/admin/users/_user.html.erb %>
+<div class="user">
+  <div class="user-info">
+    <p>
+      <strong>Email:</strong>
+      <%= user.email %>
+    </p>
+    
+    <p>
+      <strong>Status:</strong>
+      <span class="status <%= user.is_blocked ? 'blocked' : 'active' %>">
+        <%= user.is_blocked ? 'Blocked' : 'Active' %>
+      </span>
+    </p>
+    
+    <p>
+      <strong>Created at:</strong>
+      <%= user.created_at.strftime("%B %d, %Y") %>
+    </p>
+  </div>
 </div>

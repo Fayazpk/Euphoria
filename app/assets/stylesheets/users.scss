@@ -1,0 +1,85 @@
+/* app/assets/stylesheets/admin/users.scss */
+
+.user-details {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .button.block {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .button.block:hover {
+    background-color: #c82333;
+  }
+  
+  .button.unblock {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .button.unblock:hover {
+    background-color: #218838;
+  }
+  
+  .button.edit {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .button.edit:hover {
+    background-color: #0056b3;
+  }
+  
+  .button.delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .button.delete:hover {
+    background-color: #c82333;
+  }
+  
+  .button.back {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .button.back:hover {
+    background-color: #5a6268;
+  }
+  
+  .status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .status.active {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .status.blocked {
+    background-color: #dc3545;
+    color: white;
+  }

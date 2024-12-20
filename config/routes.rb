@@ -23,7 +23,7 @@ Rails.application.routes.draw do
     resources :categories, only: [:index, :show] do
       resources :subcategories, only: [:index] do
         resources :products, only: [:index, :show] do
-          resources :productviews, only: [:index] 
+          resources :productviews, only: [:index]
         end
       end
     end
@@ -31,7 +31,12 @@ Rails.application.routes.draw do
 
   # Admin namespace
   namespace :admin do
-      resources :products do
+    resources :users do
+      member do
+        patch :toggle_block
+      end
+    end
+    resources :products do
       get :subcategories, on: :collection
     end
     resources :categories
@@ -39,6 +44,12 @@ Rails.application.routes.draw do
     get 'dashboard', to: 'dashboard#index'
   end
 
+  # ActionCable route for WebSocket connections
+  mount ActionCable.server => '/cable'
+
   # Root path
   root 'registrations#new'
+
+  # Favicon route (optional if you want to handle explicitly, or just place favicon.ico in public/)
+  get '/favicon.ico', to: 'application#favicon'  # Uncomment if you want to handle it in a controller
 end

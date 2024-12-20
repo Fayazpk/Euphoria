@@ -286,6 +286,9 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
+    omniauth-rails_csrf_protection (1.0.2)
+      actionpack (>= 4.2)
+      omniauth (~> 2.0)
     os (1.1.4)
     ostruct (0.6.1)
     parallel (1.26.3)
@@ -507,7 +510,9 @@ DEPENDENCIES
   kaminari
   letter_opener
   mail
+  omniauth
   omniauth-google-oauth2
+  omniauth-rails_csrf_protection
   pg (~> 1.1)
   propshaft
   pry (~> 0.14.2)

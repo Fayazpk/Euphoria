@@ -1,32 +1,37 @@
-<%= form_with(model: admin_user) do |form| %>
-  <% if admin_user.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(admin_user.errors.count, "error") %> prohibited this admin_user from being saved:</h2>
-
-      <ul>
-        <% admin_user.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+<%# app/views/admin/users/_form.html.erb %>
+<%= form_with(model: [:admin, user], local: true) do |form| %>
+  <% if user.errors.any? %>
+    <div class="error-messages mb-4">
+      <h2 class="text-red-600"><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <ul class="list-disc pl-5 text-red-600">
+        <% user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :email, style: "display: block" %>
-    <%= form.text_field :email %>
+  <div class="field mb-4">
+    <%= form.label :email, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.email_field :email, required: true, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500" %>
   </div>
 
-  <div>
-    <%= form.label :password_digest, style: "display: block" %>
-    <%= form.text_field :password_digest %>
+  <div class="field mb-4">
+    <%= form.label :password, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.password_field :password, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500" %>
   </div>
 
-  <div>
-    <%= form.label :is_blocked, style: "display: block" %>
-    <%= form.checkbox :is_blocked %>
+  <div class="field mb-4">
+    <%= form.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.password_field :password_confirmation, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500" %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="field mb-4">
+    <%= form.label :is_blocked, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.check_box :is_blocked, class: "h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300 rounded" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" %>
   </div>
 <% end %>

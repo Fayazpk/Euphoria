@@ -1,70 +1,79 @@
 class Admin::UsersController < ApplicationController
-  before_action :set_admin_user, only: %i[ show edit update destroy ]
-
-  # GET /admin/users or /admin/users.json
+  layout 'admin'
+  before_action :require_admin
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :toggle_block]
+  
   def index
-    @admin_users = Admin::User.all
+    @users = User.all.order(created_at: :desc)
   end
 
-  # GET /admin/users/1 or /admin/users/1.json
   def show
   end
 
-  # GET /admin/users/new
   def new
-    @admin_user = Admin::User.new
+    @user = User.new
   end
 
-  # GET /admin/users/1/edit
   def edit
   end
 
-  # POST /admin/users or /admin/users.json
   def create
-    @admin_user = Admin::User.new(admin_user_params)
+    @user = User.new(user_params)
 
-    respond_to do |format|
-      if @admin_user.save
-        format.html { redirect_to @admin_user, notice: "User was successfully created." }
-        format.json { render :show, status: :created, location: @admin_user }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @admin_user.errors, status: :unprocessable_entity }
-      end
+    if @user.save
+      redirect_to admin_user_path(@user), notice: 'User was successfully created.'
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /admin/users/1 or /admin/users/1.json
   def update
-    respond_to do |format|
-      if @admin_user.update(admin_user_params)
-        format.html { redirect_to @admin_user, notice: "User was successfully updated." }
-        format.json { render :show, status: :ok, location: @admin_user }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @admin_user.errors, status: :unprocessable_entity }
-      end
+    if @user.update(user_params)
+      redirect_to admin_user_path(@user), notice: 'User was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /admin/users/1 or /admin/users/1.json
   def destroy
-    @admin_user.destroy!
+    @user = User.find_by(id: params[:id]) # Use find_by to avoid exceptions
+  
+    if @user
+      @user.destroy
+      flash[:notice] = "User was successfully deleted."
+      redirect_to admin_users_path
+    else
+      flash[:alert] = "User not found."
+      redirect_to admin_users_path
+    end
+  end
 
-    respond_to do |format|
-      format.html { redirect_to admin_users_path, status: :see_other, notice: "User was successfully destroyed." }
-      format.json { head :no_content }
+  def toggle_block
+    @user = User.find_by(id: params[:id]) # Use find_by to avoid exceptions
+
+    if @user
+      @user.update(is_blocked: !@user.is_blocked)
+      status = @user.is_blocked ? 'blocked' : 'unblocked'
+      redirect_to admin_user_path(@user), notice: "User was successfully #{status}."
+    else
+      flash[:alert] = "User not found."
+      redirect_to admin_users_path
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_admin_user
-      @admin_user = Admin::User.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def admin_user_params
-      params.expect(admin_user: [ :email, :password_digest, :is_blocked ])
+  def set_user
+    @admin_user = User.find(params[:id])
+  end
+
+  def user_params
+    params.require(:user).permit(:email, :password, :password_confirmation, :is_blocked)
+  end
+
+  def require_admin
+    unless current_user&.admin?
+      redirect_to root_path, alert: 'Access denied. Admin privileges required.'
     end
+  end
 end
