@@ -4,6 +4,7 @@ class Admin::SubcategoriesController < ApplicationController
 
   # GET /admin/subcategories or /admin/subcategories.json
   def index
+    
     @admin_subcategories = Subcategory.all
   end
 

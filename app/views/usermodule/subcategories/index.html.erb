@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subcategories - Admin Dashboard</title>
+    <title>Subcategories - <%= @category.name %></title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -16,15 +16,36 @@
     </style>
 </head>
 <body class="bg-gray-50">
-  
+<div class="container mx-auto px-4 py-5">
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="/" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                    </svg>
+                    Home
+                </a>
+            </li>
+            
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-sm text-gray-500"><%= @category.name %></span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-16">
+    <div class="container mx-auto px-4 py-2">
         <h2 class="text-3xl font-bold mb-8"><%= @category.name %> - Subcategories</h2>
         <div class="grid md:grid-cols-3 gap-8">
             <% @subcategories.each do |subcategory| %>
-               
-                    <%= link_to usermodule_category_subcategory_products_path(@category, subcategory), class: "block" do %>
-
+                <%= link_to usermodule_category_subcategory_products_path(@category, subcategory), class: "block" do %>
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
                         <% if subcategory.image.attached? %>
                             <%= image_tag subcategory.image, class: "w-full h-72 object-cover" %>
@@ -40,5 +61,6 @@
             <% end %>
         </div>
     </div>
+</div>
 </body>
 </html>

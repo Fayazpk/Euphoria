@@ -37,7 +37,7 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
+ # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
  gem "image_processing", "~> 1.2"
 
 group :development, :test do
@@ -49,25 +49,23 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
- 
-    gem 'rspec-rails', '~> 6.0' # For RSpec
-    gem 'dotenv-rails'
-    gem 'mail'
-    gem 'letter_opener'
-    gem 'omniauth'
-    gem 'omniauth-google-oauth2'
-    gem 'omniauth-rails_csrf_protection'  # Important for security
-    gem 'google-cloud-storage'
-    gem 'kaminari'
-    gem 'cocoon', '~> 1.2', '>= 1.2.15'
-    gem 'pry', '~> 0.14.2'
 
-
+    gem "rspec-rails", "~> 6.0" # For RSpec
+    gem "dotenv-rails"
+    gem "mail"
+    gem "letter_opener"
+    gem "omniauth"
+    gem "omniauth-google-oauth2"
+    gem "omniauth-rails_csrf_protection"
+    gem "google-cloud-storage"
+    gem "kaminari"
+    gem "cocoon", "~> 1.2", ">= 1.2.15"
+    gem "pry", "~> 0.14.2"
   end
-  
+
   group :test do
-    gem 'factory_bot_rails'    # For test data creation
-    gem 'faker'                # For generating fake test data
+    gem "factory_bot_rails"    # For test data creation
+    gem "faker"                # For generating fake test data
   end
 
 group :development do

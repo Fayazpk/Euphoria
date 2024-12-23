@@ -52,7 +52,7 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Breadcrumbs -->
         <nav class="flex mb-6" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3 flex-wrap">
                 <li class="inline-flex items-center">
                     <a href="/" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -61,7 +61,22 @@
                         Home
                     </a>
                 </li>
-                <!-- Rest of the breadcrumb items -->
+                <li class="inline-flex items-center">
+                    <span class="mx-2 text-gray-400">/</span>
+                    <a href="/categories/<%= @category.id %>" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
+                        <%= @category.name %>
+                    </a>
+                </li>
+                <li class="inline-flex items-center">
+                    <span class="mx-2 text-gray-400">/</span>
+                    <a href="/subcategories/<%= @subcategory.id %>" class="inline-flex items-center text-sm text-gray-700 hover:text-gray-900">
+                        <%= @subcategory.name %>
+                    </a>
+                </li>
+                <li class="inline-flex items-center">
+                    <span class="mx-2 text-gray-400">/</span>
+                    <span class="text-sm text-gray-500"><%= @product.name %></span>
+                </li>
             </ol>
         </nav>
 
@@ -208,6 +223,7 @@
             </h2>
             <div class="grid md:grid-cols-4 gap-6">
             <% @related.each do |product| %>
+                <%= link_to usermodule_category_subcategory_product_path(@subcategory.category, @subcategory, product), class: "contents" do %>
               <div class="bg-white rounded-lg shadow-md p-4 text-center product-card">
                 <% if product.images.attached? %>
                   <%= image_tag product.images.first, class: "w-full rounded-lg mb-4" %>
@@ -226,6 +242,7 @@
                   </button>
                 </div>
               </div>
+              <% end %>
             <% end %>
           </div>
     </section>

@@ -3,6 +3,7 @@ class Admin::ProductsController < ApplicationController
   before_action :set_product, only: %i[show edit update destroy]
 
   def index
+    @cat = Category.all
     @products = Product.includes(:category, :subcategory, :product_variants)
                        .order(created_at: :desc)
   end

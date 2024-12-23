@@ -1,18 +1,18 @@
 Rails.application.routes.draw do
   # OmniAuth routes
-  get '/auth/:provider', to: 'sessions#oauth_request', as: :auth_request
-  get '/auth/:provider/callback', to: 'sessions#oauth_callback'
-  get '/auth/failure', to: redirect('/')
+  get '/auth/google_oauth2/callback', to: 'sessions#oauth_callback'
+  get '/auth/failure', to: 'sessions#failure'
+  get '/auth/google_oauth2', to: 'sessions#oauth_request', as: :oauth_request 
 
   # Session routes
   resource :session, only: [:new, :create, :destroy]
-  delete '/logout', to: 'sessions#destroy', as: :logout
+  delete "/logout", to: "sessions#destroy", as: :logout
 
   # Registration routes
   resources :registrations, only: [:new, :create] do
     member do
-      get 'verify_otp'
-      post 'verify_otp'
+      get "verify_otp"
+      post "verify_otp"
       post :resend_otp
     end
   end
@@ -41,15 +41,15 @@ Rails.application.routes.draw do
     end
     resources :categories
     resources :subcategories
-    get 'dashboard', to: 'dashboard#index'
+    get "dashboard", to: "dashboard#index"
   end
 
   # ActionCable route for WebSocket connections
-  mount ActionCable.server => '/cable'
+  mount ActionCable.server => "/cable"
 
   # Root path
-  root 'registrations#new'
+  root "registrations#new"
 
-  # Favicon route (optional if you want to handle explicitly, or just place favicon.ico in public/)
-  get '/favicon.ico', to: 'application#favicon'  # Uncomment if you want to handle it in a controller
+  # Optional favicon route
+  get "/favicon.ico", to: "application#favicon"
 end
