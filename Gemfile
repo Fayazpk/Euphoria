@@ -61,6 +61,7 @@ group :development, :test do
     gem "kaminari"
     gem "cocoon", "~> 1.2", ">= 1.2.15"
     gem "pry", "~> 0.14.2"
+    gem "city-state"
   end
 
   group :test do

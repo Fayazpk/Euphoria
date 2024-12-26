@@ -72,7 +72,7 @@
                         <div class="absolute right-0 w-48 py-2 bg-white rounded-md shadow-xl mega-menu">
                             <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign In</a>
                             <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Register</a>
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">My Orders</a>
+                            <%= link_to "View All Addresses", usermodule_addresses_path, class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
                             <%= button_to "Logout", session_path, method: :delete, class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
                         </div>
                     </div>

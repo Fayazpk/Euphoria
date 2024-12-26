@@ -19,6 +19,13 @@ Rails.application.routes.draw do
 
   # Usermodule namespace
   namespace :usermodule do
+    resources :users, only: [:edit, :update]
+    resources :addresses do
+      collection do
+        get :get_states
+        get :get_cities
+      end
+    end
     resources :home, only: [:index]
     resources :categories, only: [:index, :show] do
       resources :subcategories, only: [:index] do
@@ -28,6 +35,7 @@ Rails.application.routes.draw do
       end
     end
   end
+  
 
   # Admin namespace
   namespace :admin do

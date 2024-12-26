@@ -8,6 +8,10 @@ class User < ApplicationRecord
 
   attr_accessor :oauth_login
 
+  # Establishes the relationship with the Address model
+  has_many :addresses, dependent: :destroy
+  accepts_nested_attributes_for :addresses
+
   def self.from_omniauth(auth)
     user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
     user.email = auth.info.email
@@ -37,5 +41,10 @@ class User < ApplicationRecord
   # Define the oauth_login? method
   def oauth_login?
     !!@oauth_login
+  end
+
+  def user_addresses
+    user = User.find(user_id)
+    user.addresses
   end
 end
