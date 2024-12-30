@@ -1,15 +1,15 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-Size.create([
-    { size: 'S' },
-    { size: 'M' },
-    { size: 'L' },
-    { size: 'XL' }
-])
+sizes = [ 'S', 'M', 'L', 'XL' ]
+sizes.each do |size|
+  Size.find_or_create_by!(size: size)
+end
+
+ProductVariant.find_each do |variant|
+  Size.find_each do |size|
+    stock_value = rand(1..10) # Replace this with your actual logic
+    ProductVariantSize.find_or_create_by!(
+      product_variant: variant,
+      size: size,
+      stock: stock_value
+    )
+  end
+end

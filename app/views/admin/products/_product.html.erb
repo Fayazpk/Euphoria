@@ -4,40 +4,34 @@
     <p><strong>Description:</strong> <%= @product.description %></p>
     <p><strong>Category:</strong> <%= @product.category&.name || "N/A" %></p>
     <p><strong>Subcategory:</strong> <%= @product.subcategory&.name || "N/A" %></p>
-    
     <p><strong>Base Price:</strong> <%= number_to_currency(@product.base_price) %></p>
     <p><strong>Discount Percentage:</strong> <%= @product.discount_percentage || 0 %>%</p>
-
     <p><strong>Final Price:</strong> <%= number_to_currency(@product.final_price) %></p>
   </div>
 
-  <h2>Variants</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Size</th>
-        <th>Stock</th>
-        <th>Status</th> <!-- Added a column for stock status -->
-      </tr>
-    </thead>
-    <tbody>
-      <% @product.product_variants.each do |variant| %>
+  
+     <h3>Size Variants</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Size</th>
+      <th>Stock</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @product.product_variants.each do |variant| %>
+      <% variant.product_variant_sizes.each do |variant_size| %>
         <tr>
-          <!-- Displaying the human-readable size using .humanize -->
-          <td><%= variant.size.capitalize %></td> <!-- Use capitalize to make the size names more readable -->
-          <td><%= variant.stock %></td>
-          <!-- Stock Status -->
-          <td>
-            <% if variant.out_of_stock? %>
-              <span class="text-danger">Out of Stock</span>
-            <% else %>
-              <span class="text-success">In Stock</span>
-            <% end %>
-          </td>
+          <td><%= variant_size.size.size %></td> <!-- Display the size -->
+          <td><%= variant_size.stock || 0 %></td> <!-- Display the stock -->
+          <td><%= variant_size.stock.to_i > 0 ? 'In Stock' : 'Out of Stock' %></td> <!-- Display status -->
         </tr>
       <% end %>
-    </tbody>
-  </table>
+    <% end %>
+  </tbody>
+</table>
+  </div>
 
   <!-- Display product images -->
   <% @product.images.each do |image| %>

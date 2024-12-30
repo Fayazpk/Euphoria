@@ -1,37 +1,43 @@
 class Admin::ProductsController < ApplicationController
-  layout 'admin'
+  layout "admin"
   before_action :set_product, only: %i[show edit update destroy]
+  before_action :load_categories_and_subcategories, only: %i[new edit create update]
 
   def index
-    @cat = Category.all
     @products = Product.includes(:category, :subcategory, :product_variants)
-                       .order(created_at: :desc)
+                      .order(created_at: :desc)
   end
 
   def new
     @product = Product.new
-    @product.product_variants.build 
-    @categories = Category.all
-    @subcategories = Subcategory.all
+    variant = @product.product_variants.build
+    # Initialize product variant sizes for each size
+    Size.all.each do |size|
+      variant.product_variant_sizes.build(size: size)
+    end
   end
 
   def create
-    Rails.logger.info("Product Params: #{params[:product].inspect}")
     @product = Product.new(product_params)
     if @product.save
-      redirect_to admin_product_path(@product), notice: 'Product created successfully.'
+      redirect_to admin_product_path(@product), notice: "Product created successfully."
     else
-      
-      @categories = Category.all
-      @subcategories = Subcategory.all
+      # Rebuild the form structure if validation fails
+      variant = @product.product_variants.first || @product.product_variants.build
+      Size.all.each do |size|
+        variant.product_variant_sizes.find_or_initialize_by(size: size)
+      end
       render :new
     end
   end
 
   def edit
-    @categories = Category.all
-    @subcategories = Subcategory.all
-    @product.product_variants.build if @product.product_variants.empty?
+    if @product.product_variants.empty?
+      variant = @product.product_variants.build
+      Size.all.each do |size|
+        variant.product_variant_sizes.build(size: size)
+      end
+    end
   end
 
   def update
@@ -44,9 +50,9 @@ class Admin::ProductsController < ApplicationController
 
   def destroy
     if @product.destroy
-      redirect_to admin_products_path, notice: 'Product was successfully deleted.'
+      redirect_to admin_products_path, notice: "Product was successfully deleted."
     else
-      redirect_to admin_products_path, alert: 'Failed to delete product.'
+      redirect_to admin_products_path, alert: "Failed to delete product."
     end
   end
 
@@ -56,13 +62,30 @@ class Admin::ProductsController < ApplicationController
     @product = Product.find(params[:id])
   end
 
+  def load_categories_and_subcategories
+    @categories = Category.all
+    @subcategories = Subcategory.all
+  end
+
   def product_params
-  
     params.require(:product).permit(
-      :name, :description, :category_id, :subcategory_id,
-      :base_price, :discount_percentage, images: [],
-      product_variants_attributes: [:size, :stock, :id, :_destroy]
-      
+      :name,
+      :description,
+      :category_id,
+      :subcategory_id,
+      :base_price,
+      :discount_percentage,
+      images: [],
+      product_variants_attributes: [
+        :id,
+        :_destroy,
+        product_variant_sizes_attributes: [
+          :id,
+          :size_id,
+          :stock,
+          :_destroy
+        ]
+      ]
     )
   end
 end

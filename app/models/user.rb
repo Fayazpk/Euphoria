@@ -11,6 +11,7 @@ class User < ApplicationRecord
   # Establishes the relationship with the Address model
   has_many :addresses, dependent: :destroy
   accepts_nested_attributes_for :addresses
+  has_one :cart, dependent: :destroy
 
   def self.from_omniauth(auth)
     user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)

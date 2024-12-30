@@ -50,26 +50,44 @@
   <% end %>
 
   <!-- Product Variants (Nested Form for Sizes and Stock) -->
-  <h4>Product Variants</h4>
-  <%= form.fields_for :product_variants do |variant_form| %>
-    <div class="variant-fields mb-3">
-      <!-- Variant Size -->
-      <div class="mb-3">
-        <%= variant_form.label :size, "Size" %>
-        <%= variant_form.select :size, ProductVariant.sizes.keys.map { |size| [size.capitalize, size] }, { prompt: "Select a size" }, class: "form-select" %>
+  <div class="form-group">
+  <h4 class="mb-3">Size Variants</h4>
+  <%= form.fields_for :product_variant do |v| %>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <%= v.label :s_stock, "Small (S)", class: "form-label" %>
+        <%= v.number_field :s_stock, 
+            class: "form-control", 
+            min: 0,
+            placeholder: "Stock for size S" %>
       </div>
 
-      <!-- Variant Stock -->
-      <div class="mb-3">
-        <%= variant_form.label :stock, "Stock" %>
-        <%= variant_form.number_field :stock, step: '1', class: "form-control" %>
+      <div class="col-md-3">
+        <%= v.label :m_stock, "Medium (M)", class: "form-label" %>
+        <%= v.number_field :m_stock, 
+            class: "form-control", 
+            min: 0,
+            placeholder: "Stock for size M" %>
       </div>
 
-      <%= link_to_remove_association "Remove Variant", variant_form, class: "btn btn-danger" %>
+      <div class="col-md-3">
+        <%= v.label :l_stock, "Large (L)", class: "form-label" %>
+        <%= v.number_field :l_stock, 
+            class: "form-control", 
+            min: 0,
+            placeholder: "Stock for size L" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= v.label :xl_stock, "Extra Large (XL)", class: "form-label" %>
+        <%= v.number_field :xl_stock, 
+            class: "form-control", 
+            min: 0,
+            placeholder: "Stock for size XL" %>
+      </div>
     </div>
   <% end %>
-
-  <%= link_to_add_association "Add Variant", form, :product_variants, class: "btn btn-success mb-3" %>
+</div>
 
   <!-- Submit Button -->
   <div class="mb-3">

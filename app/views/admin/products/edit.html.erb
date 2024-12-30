@@ -1,5 +1,4 @@
 <%= form_with(model: @product, url: admin_product_path(@product), method: :patch, local: true, multipart: true) do |form| %>
-
   <!-- Name Field -->
   <div class="mb-3">
     <%= form.label :name, "Product Name" %>
@@ -49,39 +48,21 @@
   <h4>Product Variants</h4>
   <%= form.fields_for :product_variants do |variant_form| %>
     <div class="variant-fields mb-3">
-      <!-- Variant Size -->
-      <div class="mb-3">
-        <%= variant_form.label :size, "Size" %>
-        <%= variant_form.select :size, ProductVariant.sizes.keys.map { |size| [size.capitalize, size] }, { prompt: "Select a size" }, class: "form-select" %>
+      <div class="row g-3">
+        <% variant_form.object.product_variant_sizes.each do |product_variant_size| %>
+          <div class="col-md-3">
+            <%= variant_form.fields_for :product_variant_sizes, product_variant_size do |size_form| %>
+              <%= size_form.hidden_field :size_id, value: product_variant_size.size.id %>
+              <%= size_form.label :stock, "#{product_variant_size.size.size} Stock", class: "form-label" %>
+              <%= size_form.number_field :stock, class: "form-control", min: 0, placeholder: "Stock for #{product_variant_size.size.size}" %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
-
-      <!-- Variant Stock -->
-      <div class="mb-3">
-        <%= variant_form.label :stock, "Stock" %>
-        <%= variant_form.number_field :stock, step: 1, class: "form-control" %>
-      </div>
-
-      <!-- Remove Button for Each Variant -->
-      <button type="button" class="btn btn-danger remove-variant-btn">Remove</button>
     </div>
-  <% end %>
-
-  <%= button_to admin_product_path(@product),
-      method: :delete,
-      class: "btn btn-sm btn-outline-danger",
-      data: { turbo_confirm: "Are you sure you want to delete this product?" } do %>
-    <i class="fas fa-trash"></i> Delete
   <% end %>
 
   <div>
     <%= form.submit "Update Product", class: "btn btn-primary" %>
   </div>
-
-
-
 <% end %> <!-- Close the form_with block -->
-
-<br>
-
-<!-- Navigation Links -->
-<%= link_to "Back", admin_products_path, class: "btn btn-secondary" %>

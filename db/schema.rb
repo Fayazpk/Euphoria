@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_26_140315) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_30_041404) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -90,6 +90,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_26_140315) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "carts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -120,13 +127,34 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_26_140315) do
     t.index ["product_id"], name: "index_discounts_on_product_id"
   end
 
-  create_table "product_variants", force: :cascade do |t|
+  create_table "orderables", force: :cascade do |t|
     t.bigint "product_id", null: false
-    t.string "variant_name"
+    t.bigint "product_variant_id", null: false
+    t.bigint "cart_id", null: false
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "size"
+    t.index ["cart_id"], name: "index_orderables_on_cart_id"
+    t.index ["product_id"], name: "index_orderables_on_product_id"
+    t.index ["product_variant_id"], name: "index_orderables_on_product_variant_id"
+  end
+
+  create_table "product_variant_sizes", force: :cascade do |t|
+    t.bigint "product_variant_id", null: false
+    t.bigint "size_id", null: false
     t.integer "stock"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "size"
+    t.index ["product_variant_id"], name: "index_product_variant_sizes_on_product_variant_id"
+    t.index ["size_id"], name: "index_product_variant_sizes_on_size_id"
+  end
+
+  create_table "product_variants", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.integer "stock"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_variants_on_product_id"
   end
 
@@ -192,8 +220,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_26_140315) do
   add_foreign_key "admin_products", "sizes"
   add_foreign_key "admin_products", "subcategories"
   add_foreign_key "admin_subcategories", "categories"
+  add_foreign_key "carts", "users"
   add_foreign_key "cities", "states"
   add_foreign_key "discounts", "products"
+  add_foreign_key "orderables", "carts"
+  add_foreign_key "orderables", "product_variants"
+  add_foreign_key "orderables", "products"
+  add_foreign_key "product_variant_sizes", "product_variants"
+  add_foreign_key "product_variant_sizes", "sizes"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "subcategories"

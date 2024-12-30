@@ -1,41 +1,46 @@
 Rails.application.routes.draw do
   # OmniAuth routes
-  get '/auth/google_oauth2/callback', to: 'sessions#oauth_callback'
-  get '/auth/failure', to: 'sessions#failure'
-  get '/auth/google_oauth2', to: 'sessions#oauth_request', as: :oauth_request 
+  get "/auth/google_oauth2/callback", to: "sessions#oauth_callback"
+  get "/auth/failure", to: "sessions#failure"
+  get "/auth/google_oauth2", to: "sessions#oauth_request", as: :oauth_request
 
   # Session routes
-  resource :session, only: [:new, :create, :destroy]
+  resource :session, only: [ :new, :create, :destroy ]
   delete "/logout", to: "sessions#destroy", as: :logout
 
   # Registration routes
-  resources :registrations, only: [:new, :create] do
+  resources :registrations, only: [ :new, :create ] do
     member do
       get "verify_otp"
       post "verify_otp"
       post :resend_otp
     end
   end
+  get "search", to: "application#search"
 
-  # Usermodule namespace
   namespace :usermodule do
-    resources :users, only: [:edit, :update]
+    resource :cart, only: [ :show, :destroy ] do
+      post "add_to_cart", on: :collection
+      get "checkout", on: :collection
+    end
+
+    resources :users, only: [ :edit, :update ]
     resources :addresses do
       collection do
         get :get_states
         get :get_cities
       end
     end
-    resources :home, only: [:index]
-    resources :categories, only: [:index, :show] do
-      resources :subcategories, only: [:index] do
-        resources :products, only: [:index, :show] do
-          resources :productviews, only: [:index]
+    resources :home, only: [ :index ]
+    resources :categories, only: [ :index, :show ] do
+      resources :subcategories, only: [ :index, :show ] do
+        resources :products, only: [ :index, :show ] do
+          resources :productviews, only: [ :index ]
         end
       end
     end
   end
-  
+
 
   # Admin namespace
   namespace :admin do

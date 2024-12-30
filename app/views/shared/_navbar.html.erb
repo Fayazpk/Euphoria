@@ -23,22 +23,7 @@
 </head>
 <body>
     <!-- Top Bar -->
-    <div class="bg-gray-900 text-white py-2">
-        <div class="container mx-auto px-4 flex justify-between items-center text-sm">
-            <div class="flex items-center space-x-4">
-                <a href="tel:+1234567890" class="hover:text-gray-300">
-                    <i class="fas fa-phone mr-2"></i>+1 (234) 567-890
-                </a>
-                <a href="mailto:support@example.com" class="hover:text-gray-300">
-                    <i class="fas fa-envelope mr-2"></i>support@example.com
-                </a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="#" class="hover:text-gray-300">Track Order</a>
-                <a href="#" class="hover:text-gray-300">Store Locator</a>
-            </div>
-        </div>
-    </div>
+ 
 
     <!-- Main Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
@@ -81,19 +66,16 @@
                     <a href="#" class="flex items-center space-x-1 hover:text-blue-600">
                         <div class="relative">
                             <i class="far fa-heart text-xl"></i>
-                            <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
                         </div>
-                        <span class="hidden md:inline">Wishlist</span>
                     </a>
 
                     <!-- Cart -->
-                    <a href="#" class="flex items-center space-x-1 hover:text-blue-600">
+                   <%= link_to usermodule_cart_path(current_user.cart || current_user.create_cart), class: "flex items-center space-x-1 hover:text-blue-600" do %>
                         <div class="relative">
                             <i class="fas fa-shopping-cart text-xl"></i>
-                            <span class="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
+                            
                         </div>
-                        <span class="hidden md:inline">Cart</span>
-                    </a>
+                    <% end %>
                 </div>
             </div>
 
