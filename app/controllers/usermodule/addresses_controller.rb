@@ -2,7 +2,7 @@ module Usermodule
   class AddressesController < ApplicationController
     before_action :set_address, only: %i[show edit update destroy]
     before_action :authenticate_user!
-    before_action :load_countries, only: %i[new edit]
+    before_action :load_countries, only: %i[new edit create update]
 
     def index
       @addresses = current_user.addresses
@@ -30,7 +30,10 @@ module Usermodule
           format.html { redirect_to usermodule_address_path(@address), notice: "Address was successfully created." }
           format.json { render :show, status: :created, location: @address }
         else
-          load_countries
+          # Load states and cities if country/state is selected
+          @states = @address.country&.states || []
+          @cities = @address.state&.cities || []
+          
           format.html { render :new, status: :unprocessable_entity }
           format.json { render json: @address.errors, status: :unprocessable_entity }
         end
@@ -43,7 +46,10 @@ module Usermodule
           format.html { redirect_to usermodule_address_path(@address), notice: "Address was successfully updated." }
           format.json { render :show, status: :ok, location: @address }
         else
-          load_countries
+          # Load states and cities if country/state is selected
+          @states = @address.country&.states || []
+          @cities = @address.state&.cities || []
+          
           format.html { render :edit, status: :unprocessable_entity }
           format.json { render json: @address.errors, status: :unprocessable_entity }
         end
@@ -54,7 +60,7 @@ module Usermodule
       @address.destroy!
 
       respond_to do |format|
-        format.html { redirect_to usermodule_addresses_path, status: :see_other, notice: "Address was successfully destroyed." }
+        format.html { redirect_to usermodule_addresses_path, notice: "Address was successfully destroyed." }
         format.json { head :no_content }
       end
     end

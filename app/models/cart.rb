@@ -1,9 +1,9 @@
 class Cart < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, validate: false
   has_many :orderables, dependent: :destroy
   has_many :products, through: :orderables
 
-  # Add a method to fetch items (products) from the cart
+  # Add a method to fetch items (products) from the cart 
   def items
     self.products
   end

@@ -1,22 +1,28 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Addresses" %>
 
-<h1>Addresses</h1>
+<div class="container mx-auto my-5">
+  <h1 class="text-3xl font-semibold mb-4">Addresses</h1>
 
-<div id="admin_addresses">
-  <% @addresses.each do |address| %>
-    <%= render address %>
-    <p>
-      <%= link_to "Show this address", usermodule_address_path(address), class: "btn btn-primary btn-sm" %>
-      <%= button_to "Destroy this address", usermodule_address_path(address), 
-                    method: :delete, 
-                    class: "btn btn-danger btn-sm", 
-                    data: { confirm: "Are you sure you want to delete this address?" } %>
-    </p>
+  <% if notice %>
+    <p class="text-green-500 mb-4"><%= notice %></p>
   <% end %>
-</div>
 
-<div class="mt-4">
-  <%= link_to "New Address", new_usermodule_address_path, class: "btn btn-success" %>
+  <div id="admin_addresses" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @addresses.each do |address| %>
+      <div class="bg-white p-4 rounded-lg shadow-lg">
+        <%= render address %>
+        <div class="flex justify-between items-center mt-4">
+          <%= link_to "Show this address", usermodule_address_path(address), class: "btn btn-primary btn-sm bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300" %>
+          <%= button_to "Destroy this address", usermodule_address_path(address), 
+                        method: :delete, 
+                        class: "bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300", 
+                        data: { confirm: "Are you sure you want to delete this address?" } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6">
+    <%= link_to "New Address", new_usermodule_address_path, class: "bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300" %>
+  </div>
 </div>

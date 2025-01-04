@@ -1,12 +1,21 @@
-<p style="color: green"><%= notice %></p>
+<p class="text-green-600 font-semibold mb-4"><%= notice %></p>
 
-<%= render @address %>
-
-<div>
-  <%= link_to "Edit this address", edit_usermodule_address_path(@address) %>
-  |
-  <%= link_to "Back to addresses", usermodule_addresses_path %>
-
-  <%= button_to "Destroy this address", usermodule_address_path(@address), method: :delete %>
+<div class="bg-white shadow rounded-md p-6">
+  <%= render @address %>
 </div>
+
+<div class="mt-6 flex justify-between items-center space-x-4">
+  <%= link_to "Edit this address", 
+              edit_usermodule_address_path(@address), 
+              class: "inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300" %>
+  
+  <%= link_to "Back to addresses", 
+              usermodule_addresses_path, 
+              class: "inline-block px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-300" %>
+
+  <%= button_to "Destroy this address", 
+                usermodule_address_path(@address), 
+                method: :delete, 
+                class: "inline-block px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300",
+                data: { confirm: "Are you sure you want to delete this address?" } %>
 </div>

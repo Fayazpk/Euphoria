@@ -6,124 +6,122 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .mega-menu {
+        .dropdown-menu {
             display: none;
             transition: all 0.3s ease;
         }
-        .group:hover .mega-menu {
+        .group:hover .dropdown-menu {
             display: block;
         }
-        .search-bar {
-            transition: width 0.3s ease;
-        }
-        .search-bar:focus {
-            width: 400px;
-        }
     </style>
+    <title>Redesigned Navbar</title>
 </head>
-<body>
-    <!-- Top Bar -->
- 
+<body class="bg-gray-100">
 
-    <!-- Main Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
         <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
-                <a href="/" class="flex items-center space-x-2">
-                    <span class="text-2xl font-bold text-gray-800">Euphoria</span>
+                <a href="/" class="text-xl font-semibold text-gray-800">
+                    Euphoria
                 </a>
 
-                <!-- Search Bar -->
-                <div class="hidden md:block flex-1 max-w-xl px-6">
-                    <div class="relative">
-                        <input type="search" 
-                               placeholder="Search for products..." 
-                               class="search-bar w-full px-4 py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500">
-                        <div class="absolute left-3 top-2.5 text-gray-400">
-                            <i class="fas fa-search"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Navigation -->
-                <div class="flex items-center space-x-6">
-                    <!-- User Account -->
-                    <div class="relative group">
-                        <button class="flex items-center space-x-1 onclick:text-blue-600">
-                            <i class="far fa-user text-xl"></i>
-                            <span class="hidden md:inline"><%= current_user.email.truncate(5) %></span>
-                        </button>
-                        <div class="absolute right-0 w-48 py-2 bg-white rounded-md shadow-xl mega-menu">
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign In</a>
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Register</a>
-                            <%= link_to "View All Addresses", usermodule_addresses_path, class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
-                            <%= button_to "Logout", session_path, method: :delete, class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
-                        </div>
-                    </div>
-
-                    <!-- Wishlist -->
-                    <a href="#" class="flex items-center space-x-1 hover:text-blue-600">
-                        <div class="relative">
-                            <i class="far fa-heart text-xl"></i>
-                        </div>
-                    </a>
-
-                    <!-- Cart -->
-                   <%= link_to usermodule_cart_path(current_user.cart || current_user.create_cart), class: "flex items-center space-x-1 hover:text-blue-600" do %>
-                        <div class="relative">
-                            <i class="fas fa-shopping-cart text-xl"></i>
-                            
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <% Category.all.each do |category| %>
+                        <div class="relative group">
+                            <button class="flex items-center text-gray-700 hover:text-gray-900 font-medium space-x-1">
+                                <span><%= category.name %></span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="dropdown-menu absolute left-0 w-48 mt-2 bg-white rounded-lg shadow-lg py-2 border border-gray-200">
+                                <% category.subcategories.each do |subcategory| %>
+                                    <%= link_to usermodule_category_subcategory_products_path(category, subcategory),
+                                        class: "block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                                        <%= subcategory.name %>
+                                    <% end %>
+                                <% end %>
+                            </div>
                         </div>
                     <% end %>
                 </div>
-            </div>
 
-            <!-- Categories Menu -->
-            <div class="border-t">
-                <div class="flex justify-between items-center h-12">
-                    <div class="flex space-x-8">
-                        <% Category.all.each do |category| %>
+                <!-- Actions -->
+                <div class="flex items-center space-x-6">
+                    <!-- Search Bar -->
+                    <div data-controller="search" class="relative">
+                    <%= form_with url: search_usermodule_products_path, 
+                                  method: :get, 
+                                  class: "relative",
+                                  data: { turbo: false } do |f| %>
+                      <%= f.text_field :query,
+                          class: "w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500",
+                          placeholder: "Search products...",
+                          data: {
+                            search_target: "input",
+                            action: "input->search#search blur->search#hideResults"
+                          } %>
+                      <div class="absolute left-3 top-2.5 text-gray-400">
+                        <i class="fas fa-search"></i>
+                      </div>
+                    <% end %>
+                    
+                    <!-- Dropdown Results -->
+                    <div data-search-target="results"
+                         class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+                    </div>
+                  </div>
+
+                   
+                        <!-- User Account -->
                             <div class="relative group">
-                                <button class="flex items-center space-x-1 h-12 p">
-                                    <span><%= category.name %></span>
-                                    <i class="fas fa-chevron-down text-xs"></i>
+                                <button class="text-gray-600 hover:text-gray-900 p-2">
+                                    <i class="far fa-user text-lg"></i>
                                 </button>
-                                <div class="absolute left-0 w-64 mt-0 py-2 bg-white rounded-b-md shadow-xl mega-menu">
-                                    <% category.subcategories.each do |subcategory| %>
-                                        <%= link_to usermodule_category_subcategory_products_path(category, subcategory), 
-                                            class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" do %>
-                                            <%= subcategory.name %>
-                                        <% end %>
+                                <div class="dropdown-menu absolute left-0 md:left-auto right-0 w-64 mt-2 py-2 bg-white rounded-lg shadow-lg border border-gray-200">
+                                    <div class="px-4 py-3 border-b border-gray-200">
+                                        <p class="text-sm text-gray-500">Welcome,</p>
+                                        <p class="text-sm font-medium text-gray-800"><%= current_user.email %></p>
+                                    </div>
+                                    <%= link_to usermodule_orders_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                                        <i class="fas fa-box-open mr-2"></i> My Orders
+                                    <% end %>
+                                    <%= link_to usermodule_addresses_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                                        <i class="fas fa-map-marker-alt mr-2"></i> Addresses
+                                    <% end %>
+                                    <%= button_to session_path, method: :delete, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                     <% end %>
                                 </div>
                             </div>
+                                                <!-- Cart -->
+                    <%= link_to usermodule_cart_path(current_user.cart || current_user.create_cart),
+                        class: "relative text-gray-600 hover:text-gray-900 p-2" do %>
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <% if current_user.cart&.orderables&.count.to_i > 0 %>
+                            <span class="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                <%= current_user.cart.orderables.count %>
+                            </span>
                         <% end %>
-                    </div>
-                    <!-- Special Offers -->
-                    <a href="#" class="flex items-center space-x-2 text-blue-600 hover:text-black-600">
-                        <i class="fas fa-tag"></i>
-                        Welcome, <%= current_user.email %>
-                    </a>
+                    <% end %>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Mobile Search (shows only on mobile) -->
-    <div class="md:hidden px-4 py-3 bg-gray-50">
-        <div class="relative">
-            <input type="search" 
-                   placeholder="Search for products..." 
-                   class="w-full px-4 py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500">
+    <!-- Mobile Navigation -->
+    <div class="md:hidden bg-gray-50 p-4 border-b">
+        <%= form_with url: search_usermodule_products_path,
+            method: :get,
+            class: "relative" do |f| %>
+            <%= f.text_field :query,
+                class: "w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500",
+                placeholder: "Search products..." %>
             <div class="absolute left-3 top-2.5 text-gray-400">
                 <i class="fas fa-search"></i>
             </div>
-        </div>
+        <% end %>
     </div>
-    
-
-
-
 </body>
 </html>

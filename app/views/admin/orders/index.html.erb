@@ -1,0 +1,160 @@
+<div class="p-6">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h1 class="h2 font-weight-bold">Order Management</h1>
+      <%= form_with url: admin_orders_path, method: :get, local: true do |form| %>
+        <div class="d-flex gap-2">
+          <%= select_tag :filter_status, options_for_select([
+            ['All Orders', 'all'],
+            ['Pending', 'pending'],
+            ['Processing', 'processing'],
+            ['Shipped', 'shipped'],
+            ['Delivered', 'delivered'],
+            ['Cancelled', 'cancelled']
+          ], params[:filter_status]), class: "form-select me-2", style: "width: auto;" %>
+          
+          <%= select_tag :payment_status, options_for_select([
+            ['All Payment Statuses', 'all'],
+            ['Pending', 'pending'],
+            ['Completed', 'completed'],
+            ['Cancelled', 'cancelled'],
+            ['Failed', 'failed']
+          ], params[:payment_status]), class: "form-select me-2", style: "width: auto;" %>
+          
+          <%= submit_tag "Filter", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="card-body">
+      <div class="space-y-4">
+        <% if @loading %>
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        <% elsif @orders.empty? %>
+          <div class="text-center py-4 text-muted">
+            <p class="mb-0">No orders found</p>
+          </div>
+        <% else %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Status</th>
+                  <th>Payment Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @orders.each do |order| %>
+                  <tr>
+                    <td>
+                      <%= order.transaction_id %>
+                      <% if order.applied_coupon.present? %>
+                        <br>
+                        <small class="text-muted">Coupon: <%= order.applied_coupon %></small>
+                      <% end %>
+                    </td>
+                    <td>
+                      <%= order.user.email %>
+                      <% if order.address %>
+                        <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#address<%= order.id %>" aria-expanded="false">
+                          View Address
+                        </button>
+                        <div class="collapse" id="address<%= order.id %>">
+                          <div class="card card-body mt-2">
+                            <%= "#{order.address.first_name} #{order.address.last_name}" %><br>
+                            <%= order.address.building_name %><br>
+                            <%= order.address.street_address %><br>
+                            <%= order.address.city&.name %><br>
+                            <%= order.address.state&.name %><br>
+                            <%= order.address.country&.name %><br>
+                            Phone: <%= order.address.phone %>
+                          </div>
+                        </div>
+                      <% end %>
+                    </td>
+                    <td>$<%= number_with_precision(order.total_price, precision: 2) %></td>
+                    <td><%= order.payment_method.upcase %></td>
+                    <td>
+                      <span class="badge <%= status_class(order.status) %>">
+                        <%= order.status&.titleize %>
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge <%= payment_status_class(order.payment_status) %>">
+                        <%= order.payment_status&.titleize %>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+  <% if order.status == 'pending' %>
+    <%= button_to admin_order_path(order),
+        method: :patch,
+        class: "btn btn-sm btn-outline-primary me-2",
+        form: { data: { turbo: false } },
+        params: { status: 'processing' } do %>
+      Process
+    <% end %>
+  <% elsif order.status == 'processing' %>
+    <%= button_to admin_order_path(order),
+        method: :patch,
+        class: "btn btn-sm btn-outline-info me-2",
+        form: { data: { turbo: false } },
+        params: { status: 'shipped' } do %>
+      Ship
+    <% end %>
+  <% elsif order.status == 'shipped' %>
+    <%= button_to admin_order_path(order),
+        method: :patch,
+        class: "btn btn-sm btn-outline-success me-2",
+        form: { data: { turbo: false } },
+        params: { status: 'delivered' } do %>
+      Deliver
+    <% end %>
+  <% end %>
+
+  <% unless ['cancelled', 'delivered'].include?(order.status) %>
+    <%= button_to admin_order_path(order),
+        method: :patch,
+        class: "btn btn-sm btn-outline-danger",
+        form: { data: { 
+          turbo: false,
+          confirm: "Are you sure you want to cancel this order?"
+        } },
+        params: { status: 'cancelled' } do %>
+      Cancel
+    <% end %>
+  <% end %>
+</div>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% content_for :head do %>
+  <style>
+    .table td {
+      vertical-align: middle;
+    }
+    .btn-group .btn {
+      margin-right: 0.25rem;
+    }
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+  </style>
+<% end %>

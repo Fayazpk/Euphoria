@@ -1,0 +1,28 @@
+<!-- app/views/usermodule/checkouts/create.html.erb -->
+<h1>Checkout Confirmation</h1>
+<p>Thank you for your purchase, <%= current_user.name %>!</p>
+
+<h2>Order Details</h2>
+<ul>
+  <li><strong>Transaction ID:</strong> <%= @checkout.transaction_id %></li>
+  <li><strong>Total Amount:</strong> $<%= @checkout.total_price %></li>
+  <li><strong>Status:</strong> <%= @checkout.status.titleize %></li>
+  <li><strong>Payment Method:</strong> <%= @checkout.payment_method %></li>
+  <% if @checkout.applied_coupon.present? %>
+    <li><strong>Applied Coupon:</strong> <%= @checkout.applied_coupon %></li>
+  <% end %>
+</ul>
+
+<h2>Shipping Address</h2>
+<% address = @checkout.address %>
+<p>
+  <%= address.first_name %> <%= address.last_name %><br>
+  <%= address.building_name %><br>
+  <%= address.street_address %><br>
+  <%= address.city.name %>, <%= address.state.name %><br>
+  <%= address.phone %>
+</p>
+
+<p>We've emailed a receipt to <%= current_user.email %>. If you have any questions, please contact our support team.</p>
+
+<%= link_to 'Back to Home', root_path, class: 'btn btn-primary' %>

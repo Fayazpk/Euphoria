@@ -6,6 +6,9 @@
     <title><%= yield :title %></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <%= csrf_meta_tags %>
@@ -66,6 +69,40 @@
             padding: 15px 20px;
             margin-bottom: 20px;
         }
+
+        /* DataTables Custom Styles */
+        .dataTables_wrapper .dataTables_length select {
+            width: auto;
+            display: inline-block;
+            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            margin-left: 0.5em;
+            display: inline-block;
+            width: auto;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.5em 1em;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            padding-top: 0.85em;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary-color);
+            color: white !important;
+            border: 1px solid var(--primary-color);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--secondary-color);
+            color: white !important;
+            border: 1px solid var(--secondary-color);
+        }
     </style>
 </head>
 <body>
@@ -79,7 +116,7 @@
             <%= link_to admin_products_path, class: "nav-link" do %><i class="fas fa-box"></i> Products<% end %>
             <%= link_to admin_categories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Categories<% end %>
             <%= link_to admin_subcategories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Subcategories<% end %>
-            <a class="nav-link" href="#orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <%= link_to admin_orders_path, class: "nav-link" do %><i class="fas fa-shopping-cart"></i> Orders<% end %>
             <a class="nav-link" href="#coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
             <a class="nav-link" href="#sales-report"><i class="fas fa-chart-line"></i> Sales Report</a>
             <%= link_to admin_users_path, class: "nav-link" do %><i class="fas fa-users"></i> Users<% end %>
@@ -93,7 +130,44 @@
         <%= yield %>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+    <!-- Initialize DataTables -->
+    <script>
+        $(document).ready(function() {
+            $('.table').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                },
+                columnDefs: [
+                    { orderable: false, targets: -1 } // Disable sorting on last column (actions)
+                ],
+                order: [[0, 'asc']], // Sort by first column by default
+                drawCallback: function(settings) {
+                    // Reinitialize any Bootstrap tooltips or popovers after table redraw
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="popover"]').popover();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

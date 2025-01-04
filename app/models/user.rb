@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :addresses, dependent: :destroy
   accepts_nested_attributes_for :addresses
   has_one :cart, dependent: :destroy
+  has_many :checkouts
 
   def self.from_omniauth(auth)
     user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
@@ -25,8 +26,8 @@ class User < ApplicationRecord
 
   # Change visibility to public for OTP generation method
   def generate_otp
-    self.otp_code = SecureRandom.hex(3)
-    self.otp_expires_at = 1.minutes.from_now
+    self.otp_code = SecureRandom.random_number(100_000..999_999)  # Generates a 6-digit OTP
+    self.otp_expires_at = 1.minute.from_now
     Rails.logger.info "Generated OTP: #{otp_code}, Expires At: #{otp_expires_at}"
     save!
   end

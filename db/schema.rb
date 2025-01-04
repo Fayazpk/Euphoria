@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_30_041404) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,23 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_041404) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "checkouts", force: :cascade do |t|
+    t.bigint "cart_id", null: false
+    t.bigint "address_id", null: false
+    t.decimal "total_price"
+    t.string "applied_coupon"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "payment_method"
+    t.string "payment_status", default: "pending"
+    t.string "transaction_id"
+    t.bigint "user_id", null: false
+    t.index ["address_id"], name: "index_checkouts_on_address_id"
+    t.index ["cart_id"], name: "index_checkouts_on_cart_id"
+    t.index ["user_id"], name: "index_checkouts_on_user_id"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -221,6 +238,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_041404) do
   add_foreign_key "admin_products", "subcategories"
   add_foreign_key "admin_subcategories", "categories"
   add_foreign_key "carts", "users"
+  add_foreign_key "checkouts", "addresses"
+  add_foreign_key "checkouts", "carts"
+  add_foreign_key "checkouts", "users"
   add_foreign_key "cities", "states"
   add_foreign_key "discounts", "products"
   add_foreign_key "orderables", "carts"

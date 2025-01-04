@@ -1,0 +1,183 @@
+<!-- app/views/usermodule/checkouts/new.html.erb -->
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-6">Checkout</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Left Column - Cart Items -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+      
+      <div class="space-y-4">
+        <% @cart.orderables.each do |orderable| %>
+          <div class="flex items-center justify-between border-b pb-4">
+            <div class="flex items-center">
+              <% if orderable.product.images.attached? %>
+                <%= image_tag orderable.product.images.first, class: "w-16 h-16 object-cover rounded" %>
+              <% end %>
+              <div class="ml-4">
+                <h3 class="font-medium"><%= orderable.product.name %></h3>
+                <p class="text-sm text-gray-600">
+                  Size: <%= orderable.size %>
+                  Quantity: <%= orderable.quantity %>
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-medium">
+                <%= number_to_currency(orderable.product.base_price * (1 - orderable.product.discount_percentage / 100.0) * orderable.quantity) %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Right Column - Address and Payment -->
+    <div class="space-y-6">
+      <!-- Address Selection -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Shipping Address</h2>
+        
+        <%= form_with(model: [:usermodule, @checkout], local: true) do |f| %>
+          <% if @addresses.any? %>
+            <div class="space-y-4">
+              <% @addresses.each do |address| %>
+                <div class="border rounded p-4">
+                  <label class="flex items-center space-x-3">
+                    <%= f.radio_button :address_id, address.id, class: "form-radio" %>
+                    <span class="text-sm">
+                      <%= address.first_name %> <%= address.last_name %><br>
+                      <%= address.building_name %>,
+                      <%= address.street_address %><br>
+                      <%= address.city.name %>, <%= address.state.name %><br>
+                      <%= address.phone %>
+                    </span>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-600 mb-4">No addresses found.</p>
+          <% end %>
+
+          <%= link_to "Add New Address", new_usermodule_address_path, 
+              class: "inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+        
+          <!-- Payment Methods Section -->
+          <div class="mt-6">
+            <h3 class="font-medium mb-4">Payment Method</h3>
+            <div class="space-y-4">
+              <div class="border rounded p-4">
+                <label class="flex items-center space-x-3">
+                  <%= f.radio_button :payment_method, 'cod', class: "form-radio", checked: true %>
+                  <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 3a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm8 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-8 4a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm8 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" />
+                    </svg>
+                    <span>Cash on Delivery</span>
+                  </div>
+                </label>
+              </div>
+              
+              <div class="border rounded p-4 opacity-50">
+                <label class="flex items-center space-x-3">
+                  <%= f.radio_button :payment_method, 'card', class: "form-radio", disabled: true %>
+                  <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                      <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Credit/Debit Card (Coming Soon)</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coupon Code -->
+          <div class="mt-6">
+            <h3 class="font-medium mb-2">Have a coupon?</h3>
+            <div class="flex space-x-2">
+              <%= text_field_tag :coupon_code, nil, 
+                  class: "form-input w-full",
+                  placeholder: "Enter coupon code" %>
+              <button type="button" 
+                      onclick="applyCoupon()"
+                      class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
+                Apply
+              </button>
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="mt-6">
+            <h3 class="font-medium mb-2">Order Summary</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span><%= number_to_currency(@subtotal) %></span>
+              </div>
+              <div class="flex justify-between">
+                <span>Tax</span>
+                <span><%= number_to_currency(@tax) %></span>
+              </div>
+              <div class="flex justify-between">
+                <span>Shipping</span>
+                <span><%= number_to_currency(@shipping) %></span>
+              </div>
+              <div id="discount-row" class="flex justify-between <%= 'hidden' unless @discount&.positive? %>">
+                <span>Discount</span>
+                <span>-<%= number_to_currency(@discount) %></span>
+              </div>
+              <div class="flex justify-between font-bold border-t pt-2">
+                <span>Total</span>
+                <span id="final-total"><%= number_to_currency(@total) %></span>
+              </div>
+            </div>
+          </div>
+
+          <%= f.submit "Place Order", 
+              class: "w-full mt-6 bg-green-600 text-white px-6 py-3 rounded font-medium hover:bg-green-700",
+              data: { confirm: "Confirm your order?" } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_tag do %>
+  function applyCoupon() {
+    const couponCode = document.getElementById('coupon_code').value;
+    
+    fetch('/usermodule/checkouts/apply_coupon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+      },
+      body: JSON.stringify({ coupon_code: couponCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const discountRow = document.getElementById('discount-row');
+      const finalTotal = document.getElementById('final-total');
+      
+      if (data.discount > 0) {
+        discountRow.classList.remove('hidden');
+        discountRow.querySelector('span:last-child').textContent = 
+          `-${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.discount)}`;
+      } else {
+        discountRow.classList.add('hidden');
+      }
+      
+      finalTotal.textContent = 
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.total);
+      
+      alert(data.message);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error applying coupon');
+    });
+  }
+<% end %>

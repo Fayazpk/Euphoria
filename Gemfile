@@ -60,9 +60,10 @@ group :development, :test do
     gem "google-cloud-storage"
     gem "kaminari"
     gem "cocoon", "~> 1.2", ">= 1.2.15"
-     gem "pry"
-  gem "pry-rails"
+    gem "pry"
+    gem "pry-rails"
     gem "city-state"
+    gem "webpacker"
   end
 
   group :test do

@@ -1,0 +1,200 @@
+<div class="container-fluid py-4">
+  <div class="row g-4">
+    <!-- Orders List Panel -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h3 class="card-title mb-0">Order History</h3>
+        </div>
+        <div class="list-group list-group-flush">
+          <% @orders.each do |order| %>
+            <%= link_to usermodule_orders_path(selected_order: order.id), 
+                class: "list-group-item list-group-item-action #{'active' if order == @selected_order}" do %>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">Order #<%= order.id %></h6>
+                  <small class="text-muted">
+                    <%= order.created_at.strftime('%B %d, %Y') %>
+                  </small>
+                </div>
+                <span class="badge <%= status_class(order.status) %> rounded-pill">
+                  <%= order.status.capitalize %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="card-footer bg-white">
+          <%= paginate @orders %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Details Panel -->
+    <div class="col-md-8">
+      <% if @selected_order %>
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h3 class="card-title mb-0">
+                Order #<%= @selected_order.id %>
+              </h3>
+              <span class="badge <%= status_class(@selected_order.status) %> rounded-pill">
+                <%= @selected_order.status.capitalize %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <!-- Order Meta Information -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Order Date</p>
+                <p class="fw-bold">
+                  <%= @selected_order.created_at.strftime('%B %d, %Y %H:%M') %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Current Shipping Address -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Current Shipping Address</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="mb-1">
+                      <i class="bi bi-person"></i>
+                      <%= @selected_order.address.first_name %> <%= @selected_order.address.last_name %>
+                    </p>
+                    <p class="mb-1">
+                      <i class="bi bi-building"></i>
+                      <%= @selected_order.address.building_name %>
+                    </p>
+                    <p class="mb-1">
+                      <i class="bi bi-geo-alt"></i>
+                      <%= @selected_order.address.street_address %>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="mb-1">
+                      <i class="bi bi-globe"></i>
+                      <%= @selected_order.address.city.name %>, 
+                      <%= @selected_order.address.state.name %>, 
+                      <%= @selected_order.address.country.name %>
+                    </p>
+                    <p class="mb-1">
+                      <i class="bi bi-telephone"></i>
+                      <%= @selected_order.address.phone %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Address Form -->
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Edit Shipping Address</h5>
+                <%= form_with model: @selected_order.address, 
+                            url: update_address_usermodule_order_path(@selected_order), 
+                            method: :patch, 
+                            local: true, 
+                            class: 'needs-validation',
+                            data: { turbo: false } do |f| %>
+                  
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-floating">
+                        <%= f.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true %>
+                        <%= f.label :first_name %>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <div class="form-floating">
+                        <%= f.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true %>
+                        <%= f.label :last_name %>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="form-floating">
+                        <%= f.text_field :building_name, class: 'form-control', placeholder: 'Building Name' %>
+                        <%= f.label :building_name %>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="form-floating">
+                        <%= f.text_field :street_address, class: 'form-control', placeholder: 'Street Address', required: true %>
+                        <%= f.label :street_address %>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <div class="form-floating">
+                        <%= f.select :city_id, 
+                                   City.all.collect { |c| [c.name, c.id] }, 
+                                   { include_blank: 'Select City' }, 
+                                   class: 'form-select',
+                                   required: true %>
+                        <%= f.label :city_id, "City" %>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <div class="form-floating">
+                        <%= f.select :state_id, 
+                                   State.all.collect { |s| [s.name, s.id] }, 
+                                   { include_blank: 'Select State' }, 
+                                   class: 'form-select',
+                                   required: true %>
+                        <%= f.label :state_id, "State" %>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <div class="form-floating">
+                        <%= f.select :country_id, 
+                                   Country.all.collect { |c| [c.name, c.id] }, 
+                                   { include_blank: 'Select Country' }, 
+                                   class: 'form-select',
+                                   required: true %>
+                        <%= f.label :country_id, "Country" %>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="form-floating">
+                        <%= f.telephone_field :phone, class: 'form-control', placeholder: 'Phone Number', required: true %>
+                        <%= f.label :phone %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <%= f.submit "Update Address", 
+                                class: 'btn btn-primary',
+                                disabled: @selected_order.status == 'shipped' %>
+                    
+                    <% if @selected_order.status == 'shipped' %>
+                      <small class="text-muted d-block mt-2">
+                        Address cannot be modified for shipped orders
+                      </small>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="card shadow-sm">
+          <div class="card-body text-center py-5">
+            <p class="text-muted mb-0">Select an order from the list to view details</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

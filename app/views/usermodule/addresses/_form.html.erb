@@ -1,9 +1,8 @@
-<%# app/views/usermodule/addresses/_form.html.erb %>
 <%= form_with(model: [:usermodule, @address], local: true) do |form| %>
   <% if @address.errors.any? %>
-    <div class="error-messages">
-      <h2><%= pluralize(@address.errors.count, "error") %> prohibited this address from being saved:</h2>
-      <ul>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+      <h2 class="font-semibold"><%= pluralize(@address.errors.count, "error") %> prohibited this address from being saved:</h2>
+      <ul class="list-disc ml-5">
         <% @address.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -13,33 +12,34 @@
 
   <div class="form-wrapper" data-controller="location">
     <div class="grid grid-cols-1 gap-6">
+
       <div class="field">
-        <%= form.label :first_name %>
-        <%= form.text_field :first_name, class: "form-input mt-1 block w-full" %>
+        <%= form.label :first_name, class: "block text-sm font-semibold text-gray-700" %>
+        <%= form.text_field :first_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
       <div class="field">
-        <%= form.label :last_name %>
-        <%= form.text_field :last_name, class: "form-input mt-1 block w-full" %>
+        <%= form.label :last_name, class: "block text-sm font-semibold text-gray-700" %>
+        <%= form.text_field :last_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
       <div class="field">
-        <%= form.label :building_name %>
-        <%= form.text_field :building_name, class: "form-input mt-1 block w-full" %>
+        <%= form.label :building_name, class: "block text-sm font-semibold text-gray-700" %>
+        <%= form.text_field :building_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
       <div class="field">
-        <%= form.label :street_address %>
-        <%= form.text_field :street_address, class: "form-input mt-1 block w-full" %>
+        <%= form.label :street_address, class: "block text-sm font-semibold text-gray-700" %>
+        <%= form.text_field :street_address, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
       <div class="field">
-        <%= form.label :country %>
+        <%= form.label :country, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.select :country_id, 
             @countries.pluck(:name, :id), 
             { prompt: 'Select Country' }, 
             { 
-              class: "form-select mt-1 block w-full",
+              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
               data: { 
                 location_target: "country",
                 action: "change->location#updateStates"
@@ -49,12 +49,12 @@
       </div>
 
       <div class="field">
-        <%= form.label :state %>
+        <%= form.label :state, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.select :state_id, 
             @states.map { |s| [s.name, s.id] },
             { prompt: 'Select State' }, 
             { 
-              class: "form-select mt-1 block w-full",
+              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
               data: { 
                 location_target: "state",
                 action: "change->location#updateCities"
@@ -64,25 +64,25 @@
       </div>
 
       <div class="field">
-        <%= form.label :city %>
+        <%= form.label :city, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.select :city_id, 
             @cities.map { |c| [c.name, c.id] },
             { prompt: 'Select City' }, 
             { 
-              class: "form-select mt-1 block w-full",
+              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
               data: { location_target: "city" }
             } 
         %>
       </div>
 
       <div class="field">
-        <%= form.label :phone %>
-        <%= form.text_field :phone, class: "form-input mt-1 block w-full" %>
+        <%= form.label :phone, class: "block text-sm font-semibold text-gray-700" %>
+        <%= form.text_field :phone, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
     </div>
 
     <div class="mt-6">
-      <%= form.submit class: "btn btn-primary" %>
+      <%= form.submit "Save Address", class: "btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300" %>
     </div>
   </div>
 <% end %>
