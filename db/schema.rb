@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_14_095232) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,8 +52,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "country_id"
     t.bigint "state_id"
+    t.bigint "country_id"
     t.index ["city_id"], name: "index_addresses_on_city_id"
     t.index ["country_id"], name: "index_addresses_on_country_id"
     t.index ["state_id"], name: "index_addresses_on_state_id"
@@ -116,8 +116,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
     t.string "payment_status", default: "pending"
     t.string "transaction_id"
     t.bigint "user_id", null: false
+    t.string "razorpay_order_id"
+    t.string "razorpay_payment_id"
+    t.string "razorpay_signature"
+    t.datetime "delivered_at"
     t.index ["address_id"], name: "index_checkouts_on_address_id"
     t.index ["cart_id"], name: "index_checkouts_on_cart_id"
+    t.index ["created_at"], name: "index_checkouts_on_created_at"
+    t.index ["payment_status"], name: "index_checkouts_on_payment_status"
+    t.index ["razorpay_order_id"], name: "index_checkouts_on_razorpay_order_id"
+    t.index ["razorpay_payment_id"], name: "index_checkouts_on_razorpay_payment_id"
     t.index ["user_id"], name: "index_checkouts_on_user_id"
   end
 
@@ -132,6 +140,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
 
   create_table "countries", force: :cascade do |t|
     t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.string "code"
+    t.decimal "discount"
+    t.text "description"
+    t.date "valid_from"
+    t.date "valid_until"
+    t.integer "max_usage"
+    t.boolean "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -155,6 +175,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
     t.index ["cart_id"], name: "index_orderables_on_cart_id"
     t.index ["product_id"], name: "index_orderables_on_product_id"
     t.index ["product_variant_id"], name: "index_orderables_on_product_variant_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.string "razorpay_payment_id"
+    t.decimal "amount"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "product_variant_sizes", force: :cascade do |t|
@@ -186,6 +214,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
     t.decimal "discount_percentage", precision: 5, scale: 2, default: "0.0"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
+  end
+
+  create_table "return_requests", force: :cascade do |t|
+    t.bigint "checkout_id", null: false
+    t.bigint "user_id", null: false
+    t.string "reason"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["checkout_id"], name: "index_return_requests_on_checkout_id"
+    t.index ["user_id"], name: "index_return_requests_on_user_id"
   end
 
   create_table "sizes", force: :cascade do |t|
@@ -227,6 +266,38 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
+  create_table "wallet_transactions", force: :cascade do |t|
+    t.bigint "wallet_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.string "transaction_type"
+    t.string "description"
+    t.bigint "checkout_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "balance_after", precision: 10, scale: 2
+    t.string "transaction_id"
+    t.index ["checkout_id"], name: "index_wallet_transactions_on_checkout_id"
+    t.index ["transaction_id"], name: "index_wallet_transactions_on_transaction_id", unique: true
+    t.index ["wallet_id"], name: "index_wallet_transactions_on_wallet_id"
+  end
+
+  create_table "wallets", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.decimal "balance", precision: 10, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_wallets_on_user_id"
+  end
+
+  create_table "wishlists", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_wishlists_on_product_id"
+    t.index ["user_id"], name: "index_wishlists_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "cities"
@@ -251,6 +322,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_02_092746) do
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "subcategories"
+  add_foreign_key "return_requests", "checkouts"
+  add_foreign_key "return_requests", "users"
   add_foreign_key "states", "countries"
   add_foreign_key "subcategories", "categories"
+  add_foreign_key "wallet_transactions", "checkouts"
+  add_foreign_key "wallet_transactions", "wallets"
+  add_foreign_key "wallets", "users"
+  add_foreign_key "wishlists", "products"
+  add_foreign_key "wishlists", "users"
 end

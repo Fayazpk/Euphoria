@@ -1,0 +1,12 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @admin_coupon %>
+
+<div>
+  <%= link_to "Edit this coupon", edit_admin_coupon_path(@admin_coupon) %> |
+  <%= link_to "Back to coupons", admin_coupons_path %>
+
+  <%= button_to "Destroy this coupon", admin_coupon_path(@admin_coupon), 
+        method: :delete,
+        form: { data: { turbo_confirm: "Are you sure?" } } %>
+</div>

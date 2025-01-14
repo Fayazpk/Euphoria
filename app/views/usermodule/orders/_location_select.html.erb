@@ -1,0 +1,36 @@
+
+<div class="col-md-4">
+  <div class="form-floating">
+    <%= f.select :country_id, 
+                 Country.all.collect { |c| [c.name, c.id] }, 
+                 { include_blank: 'Select Country' }, 
+                 class: 'form-select',
+                 required: true,
+                 id: 'countrySelect' %>
+    <%= f.label :country_id, "Country" %>
+  </div>
+</div>
+
+<div class="col-md-4">
+  <div class="form-floating">
+    <%= f.select :state_id, 
+               State.all.collect { |s| [s.name, s.id] }, 
+               { include_blank: 'Select State' }, 
+               class: 'form-select',
+               required: true ,
+               id: "stateSelect" %>
+    <%= f.label :state_id, "State" %>
+  </div>
+</div>
+
+<div class="col-md-4">
+  <div class="form-floating">
+    <%= f.select :city_id, 
+               City.all.collect { |c| [c.name, c.id] }, 
+               { include_blank: 'Select City' }, 
+               class: 'form-select',
+               required: true,
+               id: "countrySelect" %>
+    <%= f.label :city_id, "City" %>
+  </div>
+</div>

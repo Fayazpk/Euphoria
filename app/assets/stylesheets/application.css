@@ -1,14 +1,3 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
-
 /* Custom Variables */
 :root {
   --primary-color: #2c3e50;
@@ -20,9 +9,53 @@
 }
 
 /* Global Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+}
+
+/* Footer Styles */
+footer {
+  background-color: #1f2937;
+  text-align: center;
+  padding: 20px 0;
+  color: white;
+  margin-top: auto;
+}
+
+footer .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+footer .container .section {
+  padding: 0 1rem;
+}
+
+footer .section h4 {
+  font-weight: bold;
+}
+
+footer .section a {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer .section a:hover {
+  color: var(--accent-color);
 }
 
 /* Product Card */
@@ -107,8 +140,14 @@ body {
     height: 30px;
   }
   
+  footer .container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
   .footer {
     text-align: center;
+    margin-top: auto;
   }
 }
 

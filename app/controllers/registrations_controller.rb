@@ -22,7 +22,7 @@ class RegistrationsController < ApplicationController
 
   def verify_otp
     if request.post?
-      # Handle OTP verification
+      
       submitted_otp = params[:user][:otp]
       
       if submitted_otp.blank?
@@ -39,7 +39,7 @@ class RegistrationsController < ApplicationController
         return render :verify_otp
       end
     end
-    # GET request will just render the form
+
   end
   def resend_otp
     if @user
@@ -56,7 +56,7 @@ class RegistrationsController < ApplicationController
   private
 
   def find_user
-    @user = User.find_by(id: params[:id]) # Ensure :id is used for finding user
+    @user = User.find_by(id: params[:id]) 
     unless @user
       flash[:alert] = "User not found"
       redirect_to new_registration_path
@@ -67,7 +67,6 @@ class RegistrationsController < ApplicationController
     params.require(:user).permit(:email, :password, :password_confirmation)
   end
   def redirect_if_authenticated
-    # Ensure users can't access the login or OAuth request pages if they're already logged in
     redirect_to usermodule_home_index_path, notice: "You are already logged in." if user_signed_in? && !request.path.include?("/auth/")
   end
 end

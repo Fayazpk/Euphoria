@@ -1,4 +1,4 @@
-# app/controllers/sessions_controller.rb
+
 class SessionsController < ApplicationController
   before_action :redirect_if_authenticated, only: [:new, :create]
 
@@ -31,7 +31,7 @@ class SessionsController < ApplicationController
     auth = request.env['omniauth.auth']
     @user = User.from_omniauth(auth)
 
-    # Set the session and redirect
+  
     session[:user_id] = @user.id
     redirect_to root_path, notice: 'Successfully signed in!'
   end
@@ -48,7 +48,7 @@ class SessionsController < ApplicationController
   private
 
   def redirect_if_authenticated
-    # Ensure users can't access the login or OAuth request pages if they're already logged in
+
     redirect_to usermodule_home_index_path, notice: "You are already logged in." if user_signed_in?
   end
 end

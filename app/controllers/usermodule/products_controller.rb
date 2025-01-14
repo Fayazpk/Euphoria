@@ -7,36 +7,28 @@ class Usermodule::ProductsController < ApplicationController
     @products = @products.order(sort_order(params[:sort]))
     @products = @products.where("base_price >= ?", params[:min_price]) if params[:min_price].present?
     @products = @products.where("base_price <= ?", params[:max_price]) if params[:max_price].present?
-  end
-
-  def search
     if params[:query].present?
-      @products = Product.where("name ILIKE ?", "%#{params[:query]}%")
-                        .limit(5)  # Limit results for dropdown
-      
-      respond_to do |format|
-        format.html { redirect_to usermodule_products_path(query: params[:query]) }
-        format.json { 
-          render json: @products.map { |product| {
-            id: product.id,
-            name: product.name,
-            url: usermodule_category_subcategory_product_path(
-              product.category,
-              product.subcategory,
-              product
-            )
-          }}
-        }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to usermodule_products_path }
-        format.json { render json: [] }
-      end
+      @products = @products.where("name ILIKE ?", "%#{params[:query]}%")
     end
   end
-end
 
+  
+  def search
+    if params[:query].present?
+      @products = Product.where('name ILIKE ?', "%#{params[:query]}%")
+                        .limit(10)
+                        .select(:id, :name)  # Only select needed fields
+      
+      render json: @products.map { |product| {
+        id: product.id,
+        name: product.name
+      }}
+    else
+      render json: []
+    end
+  end
+
+  
   private
 
   SORT_OPTIONS = %w[ price_asc price_desc newest discount].freeze

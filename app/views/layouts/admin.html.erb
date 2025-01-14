@@ -117,8 +117,9 @@
             <%= link_to admin_categories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Categories<% end %>
             <%= link_to admin_subcategories_path, class: "nav-link" do %><i class="fas fa-tags"></i> Subcategories<% end %>
             <%= link_to admin_orders_path, class: "nav-link" do %><i class="fas fa-shopping-cart"></i> Orders<% end %>
-            <a class="nav-link" href="#coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
-            <a class="nav-link" href="#sales-report"><i class="fas fa-chart-line"></i> Sales Report</a>
+             
+             <%= link_to admin_coupons_path, class: "nav-link" do %><i class="fas fa-ticket-alt"></i> Coupons<% end %>
+            
             <%= link_to admin_users_path, class: "nav-link" do %><i class="fas fa-users"></i> Users<% end %>
             <a class="nav-link" href="#banners"><i class="fas fa-image"></i> Banners</a>
             <a class="nav-link" href="#settings"><i class="fas fa-cog"></i> Settings</a>
@@ -128,6 +129,7 @@
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <%= yield %>
+        <%= yield :scripts %>
     </div>
 
     <!-- jQuery -->
@@ -139,6 +141,12 @@
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" %>
+  <%= javascript_include_tag "https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" %>
+  <%= javascript_include_tag "https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js" %>
+  <%= stylesheet_link_tag "https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" %>
+  <%= stylesheet_link_tag 'application' %>
+    <%= javascript_include_tag 'application' %>
 
     <!-- Initialize DataTables -->
     <script>

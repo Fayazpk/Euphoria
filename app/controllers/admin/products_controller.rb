@@ -11,7 +11,7 @@ class Admin::ProductsController < ApplicationController
   def new
     @product = Product.new
     variant = @product.product_variants.build
-    # Initialize product variant sizes for each size
+   
     Size.all.each do |size|
       variant.product_variant_sizes.build(size: size)
     end
@@ -21,12 +21,12 @@ class Admin::ProductsController < ApplicationController
     @product = Product.new(product_params)
 
     if @product.save
-      # Handle image processing if needed
+    
       process_images if params[:product][:images].present?
 
-      redirect_to admin_product_path(@product), notice: "Product created successfully."
+      redirect_to admin_products_path(@product), notice: "Product created successfully."
     else
-      # Rebuild the form structure if validation fails
+    
       variant = @product.product_variants.first || @product.product_variants.build
       Size.all.each do |size|
         variant.product_variant_sizes.find_or_initialize_by(size: size)
@@ -45,11 +45,11 @@ class Admin::ProductsController < ApplicationController
   end
 
   def update
-    # Handle image deletions
+   
     delete_images if params[:product][:delete_images].present?
 
     if @product.update(product_params)
-      # Handle new image processing if needed
+     
       process_images if params[:product][:images].present?
 
       redirect_to admin_product_path(@product), notice: "Product was successfully updated."
@@ -104,13 +104,10 @@ class Admin::ProductsController < ApplicationController
     return unless params[:product][:images].present?
 
     params[:product][:images].each do |image|
-      # Skip if it's not a valid image file
+      
       next unless image.content_type.start_with?("image/")
 
-      # You might want to process the image here (e.g., resize, compress)
-      # Example using mini_magick:
-      # processed_image = MiniMagick::Image.new(image.tempfile.path)
-      # processed_image.resize "800x800>"
+ 
 
       @product.images.attach(image)
     end
@@ -127,7 +124,7 @@ class Admin::ProductsController < ApplicationController
     end
   end
 
-  # Optional: Add image validation method
+ 
   def validate_images
     return true if params[:product][:images].nil?
 
@@ -154,6 +151,5 @@ class Admin::ProductsController < ApplicationController
     valid
   end
 
-  # Optional: Add before_action for image validation
-  # before_action :validate_images, only: [:create, :update]
+
 end

@@ -1,0 +1,14 @@
+<div class="relative group">
+  <button class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+    <span class="font-medium">₹<%= number_with_precision(current_user.wallet.balance, precision: 2) %></span>
+  </button>
+  
+  <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+    <%= link_to usermodule_wallet_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" do %>
+      View Wallet
+    <% end %>
+  </div>
+</div>

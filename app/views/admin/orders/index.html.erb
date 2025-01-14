@@ -1,9 +1,10 @@
 <div class="p-6">
   <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h1 class="h2 font-weight-bold">Order Management</h1>
-      <%= form_with url: admin_orders_path, method: :get, local: true do |form| %>
-        <div class="d-flex gap-2">
+    <div class="card-header">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <h1 class="h2 font-weight-bold mb-0">Order Management</h1>
+        
+        <%= form_with url: admin_orders_path, method: :get, class: "d-flex flex-wrap gap-2", local: true do |form| %>
           <%= select_tag :filter_status, options_for_select([
             ['All Orders', 'all'],
             ['Pending', 'pending'],
@@ -11,7 +12,7 @@
             ['Shipped', 'shipped'],
             ['Delivered', 'delivered'],
             ['Cancelled', 'cancelled']
-          ], params[:filter_status]), class: "form-select me-2", style: "width: auto;" %>
+          ], params[:filter_status]), class: "form-select", style: "width: auto;" %>
           
           <%= select_tag :payment_status, options_for_select([
             ['All Payment Statuses', 'all'],
@@ -19,11 +20,19 @@
             ['Completed', 'completed'],
             ['Cancelled', 'cancelled'],
             ['Failed', 'failed']
-          ], params[:payment_status]), class: "form-select me-2", style: "width: auto;" %>
+          ], params[:payment_status]), class: "form-select", style: "width: auto;" %>
+          
+          <%= select_tag :return_status, options_for_select([
+            ['All Return Statuses', 'all'],
+            ['Pending Returns', 'pending'],
+            ['Approved Returns', 'approved'],
+            ['Rejected Returns', 'rejected'],
+            ['Completed Returns', 'completed']
+          ], params[:return_status]), class: "form-select", style: "width: auto;" %>
           
           <%= submit_tag "Filter", class: "btn btn-primary" %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
 
     <div class="card-body">
@@ -43,12 +52,11 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Transaction ID</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                  <th>Status</th>
-                  <th>Payment Status</th>
+                  <th>Order Info</th>
+                  <th>Customer Details</th>
+                  <th>Payment Info</th>
+                  <th>Order Status</th>
+                  <th>Return Request</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -56,88 +64,171 @@
                 <% @orders.each do |order| %>
                   <tr>
                     <td>
-                      <%= order.transaction_id %>
-                      <% if order.applied_coupon.present? %>
-                        <br>
-                        <small class="text-muted">Coupon: <%= order.applied_coupon %></small>
-                      <% end %>
+                      <div class="d-flex flex-column">
+                        <strong><%= order.transaction_id %></strong>
+                        <small class="text-muted">
+                          <%= order.created_at.strftime('%B %d, %Y %H:%M') %>
+                        </small>
+                        <% if order.applied_coupon.present? %>
+                          <span class="badge bg-info mt-1">
+                            Coupon: <%= order.applied_coupon %>
+                          </span>
+                        <% end %>
+                      </div>
                     </td>
+
                     <td>
-                      <%= order.user.email %>
-                      <% if order.address %>
-                        <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#address<%= order.id %>" aria-expanded="false">
-                          View Address
-                        </button>
-                        <div class="collapse" id="address<%= order.id %>">
-                          <div class="card card-body mt-2">
-                            <%= "#{order.address.first_name} #{order.address.last_name}" %><br>
-                            <%= order.address.building_name %><br>
-                            <%= order.address.street_address %><br>
-                            <%= order.address.city&.name %><br>
-                            <%= order.address.state&.name %><br>
-                            <%= order.address.country&.name %><br>
-                            Phone: <%= order.address.phone %>
+                      <div class="d-flex flex-column">
+                        <strong><%= order.user.email %></strong>
+                        <% if order.address %>
+                          <button class="btn btn-sm btn-link p-0 text-start" 
+                                  type="button" 
+                                  data-bs-toggle="collapse" 
+                                  data-bs-target="#address<%= order.id %>">
+                            View Address
+                          </button>
+                          <div class="collapse" id="address<%= order.id %>">
+                            <div class="card card-body mt-2 small">
+                              <p class="mb-1"><%= "#{order.address.first_name} #{order.address.last_name}" %></p>
+                              <p class="mb-1"><%= order.address.building_name %></p>
+                              <p class="mb-1"><%= order.address.street_address %></p>
+                              <p class="mb-1">
+                                <%= order.address.city&.name %>,
+                                <%= order.address.state&.name %>,
+                                <%= order.address.country&.name %>
+                              </p>
+                              <p class="mb-0">Phone: <%= order.address.phone %></p>
+                            </div>
                           </div>
-                        </div>
-                      <% end %>
+                        <% end %>
+                      </div>
                     </td>
-                    <td>$<%= number_with_precision(order.total_price, precision: 2) %></td>
-                    <td><%= order.payment_method.upcase %></td>
+
                     <td>
-                      <span class="badge <%= status_class(order.status) %>">
+                      <div class="d-flex flex-column">
+                        <strong>₹<%= number_with_precision(order.total_price, precision: 2) %></strong>
+                        <small class="text-uppercase"><%= order.payment_method %></small>
+                        <span class="badge <%= payment_status_class(order.payment_status) %> mt-1">
+                          <%= order.payment_status&.titleize %>
+                        </span>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span class="badge <%= status_class(order.status) %> fs-6">
                         <%= order.status&.titleize %>
                       </span>
                     </td>
+
                     <td>
-                      <span class="badge <%= payment_status_class(order.payment_status) %>">
-                        <%= order.payment_status&.titleize %>
-                      </span>
+                      <% if order.return_request.present? %>
+                        <div class="d-flex flex-column">
+                          <span class="badge <%= case order.return_request.status
+                            when 'pending' then 'bg-warning'
+                            when 'approved' then 'bg-info'
+                            when 'rejected' then 'bg-danger'
+                            when 'completed' then 'bg-success'
+                            end %> fs-6">
+                            <%= order.return_request.status.titleize %>
+                          </span>
+                          
+                          <% if order.return_request.pending? %>
+                            <button class="btn btn-sm btn-link p-0 text-start mt-1" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#return<%= order.id %>">
+                              View Details
+                            </button>
+                            <div class="collapse" id="return<%= order.id %>">
+                              <div class="card card-body mt-2 small">
+                                <p class="mb-1"><strong>Reason:</strong></p>
+                                <p class="mb-2"><%= order.return_request.reason %></p>
+                                <p class="mb-2">
+                                  <small class="text-muted">
+                                    Requested: <%= order.return_request.created_at.strftime('%B %d, %Y') %>
+                                  </small>
+                                </p>
+                                <div class="d-flex gap-2">
+                                  <%= button_to approve_return_admin_order_path(order),
+                                      method: :patch,
+                                      class: "btn btn-sm btn-success",
+                                      form: { data: { 
+                                        turbo: false,
+                                        confirm: "Are you sure you want to approve this return request?" 
+                                      } } do %>
+                                    Approve
+                                  <% end %>
+                                  
+                                  <%= button_to reject_return_admin_order_path(order),
+                                      method: :patch,
+                                      class: "btn btn-sm btn-danger",
+                                      form: { data: { 
+                                        turbo: false,
+                                        confirm: "Are you sure you want to reject this return request?" 
+                                      } } do %>
+                                    Reject
+                                  <% end %>
+                                </div>
+                              </div>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% else %>
+                        <span class="text-muted">No return request</span>
+                      <% end %>
                     </td>
+
                     <td>
                       <div class="btn-group">
-  <% if order.status == 'pending' %>
-    <%= button_to admin_order_path(order),
-        method: :patch,
-        class: "btn btn-sm btn-outline-primary me-2",
-        form: { data: { turbo: false } },
-        params: { status: 'processing' } do %>
-      Process
-    <% end %>
-  <% elsif order.status == 'processing' %>
-    <%= button_to admin_order_path(order),
-        method: :patch,
-        class: "btn btn-sm btn-outline-info me-2",
-        form: { data: { turbo: false } },
-        params: { status: 'shipped' } do %>
-      Ship
-    <% end %>
-  <% elsif order.status == 'shipped' %>
-    <%= button_to admin_order_path(order),
-        method: :patch,
-        class: "btn btn-sm btn-outline-success me-2",
-        form: { data: { turbo: false } },
-        params: { status: 'delivered' } do %>
-      Deliver
-    <% end %>
-  <% end %>
+                        <% case order.status %>
+                        <% when 'pending' %>
+                          <%= button_to admin_order_path(order),
+                              method: :patch,
+                              class: "btn btn-sm btn-outline-primary",
+                              form: { data: { turbo: false } },
+                              params: { status: 'processing' } do %>
+                            Process
+                          <% end %>
+                        <% when 'processing' %>
+                          <%= button_to admin_order_path(order),
+                              method: :patch,
+                              class: "btn btn-sm btn-outline-info",
+                              form: { data: { turbo: false } },
+                              params: { status: 'shipped' } do %>
+                            Ship
+                          <% end %>
+                        <% when 'shipped' %>
+                          <%= button_to admin_order_path(order),
+                              method: :patch,
+                              class: "btn btn-sm btn-outline-success",
+                              form: { data: { turbo: false } },
+                              params: { status: 'delivered' } do %>
+                            Deliver
+                          <% end %>
+                        <% end %>
 
-  <% unless ['cancelled', 'delivered'].include?(order.status) %>
-    <%= button_to admin_order_path(order),
-        method: :patch,
-        class: "btn btn-sm btn-outline-danger",
-        form: { data: { 
-          turbo: false,
-          confirm: "Are you sure you want to cancel this order?"
-        } },
-        params: { status: 'cancelled' } do %>
-      Cancel
-    <% end %>
-  <% end %>
-</div>
+                        <% unless ['cancelled', 'delivered'].include?(order.status) %>
+                          <%= button_to admin_order_path(order),
+                              method: :patch,
+                              class: "btn btn-sm btn-outline-danger ms-2",
+                              form: { data: { 
+                                turbo: false,
+                                confirm: "Are you sure you want to cancel this order?"
+                              } },
+                              params: { status: 'cancelled' } do %>
+                            Cancel
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </td>
                   </tr>
                 <% end %>
               </tbody>
             </table>
+          </div>
+
+          <div class="d-flex justify-content-center mt-4">
+            <%= paginate @orders %>
           </div>
         <% end %>
       </div>
@@ -149,12 +240,22 @@
   <style>
     .table td {
       vertical-align: middle;
+      padding: 1rem;
     }
     .btn-group .btn {
       margin-right: 0.25rem;
     }
     .btn-group .btn:last-child {
       margin-right: 0;
+    }
+    .collapse {
+      max-width: 300px;
+    }
+    .badge {
+      font-weight: 500;
+    }
+    .card-body .small {
+      font-size: 0.875rem;
     }
   </style>
 <% end %>

@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
-  # Allow modern browser versions (verify the implementation of this method).
+
   allow_browser versions: :modern
 
-  # Set the current user for this session.
+
   before_action :set_current_user
   helper_method :current_user, :user_signed_in?
 
@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   def user_signed_in?
     !!current_user
   end
-  helper_method :user_signed_in? # Expose the method to views.
+  helper_method :user_signed_in? 
 
   def authenticate_user!
     unless user_signed_in?

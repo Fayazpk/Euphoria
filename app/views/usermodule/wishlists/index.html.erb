@@ -1,0 +1,188 @@
+<!-- ERB Template -->
+<div class="container mx-auto px-4 py-8" id="wishlist-container">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">My Wishlist</h1>
+    <span class="text-gray-600" id="wishlist-count">
+      <%= pluralize(@wishlist_items.count, 'item') %>
+    </span>
+  </div>
+  
+  <div id="wishlist-content">
+    <% if @wishlist_items.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <% @wishlist_items.each do |product| %>
+          <%= link_to usermodule_category_subcategory_product_productviews_path(product.subcategory.category, product.subcategory, product), class: "group" do %>
+            <div class="product-card relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100" data-product-id="<%= product.id %>">
+              <!-- Image Container -->
+              <div class="aspect-w-1 aspect-h-1 w-full">
+                <% if product.images.any? %>
+                  <%= image_tag(product.images.first, 
+                      class: "w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500") %>
+                <% else %>
+                  <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+
+              <!-- Product Details -->
+              <div class="p-4">
+                <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <%= product.name %>
+                </h3>
+
+                <!-- Price Section -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex flex-col">
+                    <span class="text-xl font-bold text-gray-900">
+                      $<%= number_with_precision(product.final_price, precision: 2) %>
+                    </span>
+                    <% if product.discount_percentage > 0 %>
+                      <div class="flex items-center gap-2">
+                        <span class="line-through text-gray-400 text-sm">
+                          $<%= number_with_precision(product.base_price, precision: 2) %>
+                        </span>
+                        <span class="bg-red-100 text-red-600 text-xs font-medium px-2 py-0.5 rounded">
+                          <%= product.discount_percentage %>% OFF
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <!-- Wishlist Remove Button -->
+                  <button
+                    data-wishlist-action="remove"
+                    data-product-id="<%= product.id %>"
+                    class="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-gray-100"
+                    title="Remove from wishlist"
+                    onclick="event.preventDefault(); event.stopPropagation();">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div id="empty-wishlist" class="text-center py-16" style="display: <%= @wishlist_items.any? ? 'none' : 'block' %>">
+      <div class="mb-6">
+        <svg class="mx-auto w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-semibold text-gray-700 mb-3">Your wishlist is empty</h2>
+      <p class="text-gray-500 mb-8 max-w-md mx-auto">Start adding items to your wishlist to save them for later!</p>
+      <%= link_to root_path, 
+    class: "inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 gap-2" do %>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+  </svg>
+  Continue Shopping
+<% end %>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const wishlistButtons = document.querySelectorAll('[data-wishlist-action]');
+  const wishlistContent = document.getElementById('wishlist-content');
+  const emptyWishlist = document.getElementById('empty-wishlist');
+  const wishlistCount = document.getElementById('wishlist-count');
+  
+  // Store product IDs that are already in the wishlist
+  const wishlistedProducts = new Set(
+    Array.from(document.querySelectorAll('.product-card'))
+      .map(card => card.dataset.productId)
+  );
+
+  wishlistButtons.forEach(button => {
+    button.addEventListener('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = this.dataset.productId;
+      const action = this.dataset.wishlistAction;
+      
+      // Check for duplicate when adding
+      if (action === 'add' && wishlistedProducts.has(productId)) {
+        showNotification('This item is already in your wishlist', 'error');
+        return;
+      }
+
+      try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        let url, method;
+        if (action === 'remove') {
+          url = `/usermodule/wishlists/${productId}`;
+          method = 'DELETE';
+        } else {
+          url = '/usermodule/wishlists';
+          method = 'POST';
+        }
+        
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: method === 'POST' ? JSON.stringify({ product_id: productId }) : null
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          if (action === 'remove') {
+            // Remove the product card
+            const productCard = this.closest('.product-card');
+            productCard.remove();
+            wishlistedProducts.delete(productId);
+
+            // Update wishlist count
+            const remainingItems = document.querySelectorAll('.product-card').length;
+            wishlistCount.textContent = `${remainingItems} ${remainingItems === 1 ? 'item' : 'items'}`;
+
+            // Show empty state if no items left
+            if (remainingItems === 0) {
+              emptyWishlist.style.display = 'block';
+            }
+          } else {
+            wishlistedProducts.add(productId);
+          }
+          
+          showNotification(data.message, 'success');
+        } else {
+          showNotification(data.message || 'Operation failed', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating wishlist:', error);
+        showNotification('Error updating wishlist', 'error');
+      }
+    });
+  });
+});
+
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 p-4 rounded-md ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  } text-white shadow-lg z-50 transition-opacity duration-500`;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 500);
+  }, 3000);
+}
+</script>

@@ -30,7 +30,7 @@ module Usermodule
           format.html { redirect_to usermodule_address_path(@address), notice: "Address was successfully created." }
           format.json { render :show, status: :created, location: @address }
         else
-          # Load states and cities if country/state is selected
+        
           @states = @address.country&.states || []
           @cities = @address.state&.cities || []
           
@@ -41,12 +41,13 @@ module Usermodule
     end
 
     def update
+      
       respond_to do |format|
         if @address.update(address_params)
           format.html { redirect_to usermodule_address_path(@address), notice: "Address was successfully updated." }
           format.json { render :show, status: :ok, location: @address }
         else
-          # Load states and cities if country/state is selected
+         
           @states = @address.country&.states || []
           @cities = @address.state&.cities || []
           
@@ -65,17 +66,30 @@ module Usermodule
       end
     end
 
-    def get_states
-      country = Country.find(params[:country_id])
-      states = country.states.select(:id, :name)
-      render json: states
-    end
 
-    def get_cities
-      state = State.find(params[:state_id])
-      cities = state.cities.select(:id, :name)
-      render json: cities
-    end
+def get_states
+  begin
+    states = State.where(country_id: params[:country_id])
+                  .select(:id, :name)
+                  .order(:name)
+                  Rails.logger.info(states)
+
+    render json: states
+  rescue => e
+    render json: { error: "Failed to load states" }, status: :unprocessable_entity
+  end
+end
+
+def get_cities
+  begin
+    cities = City.where(state_id: params[:state_id])
+                 .select(:id, :name)
+                 .order(:name)
+    render json: cities
+  rescue => e
+    render json: { error: "Failed to load cities" }, status: :unprocessable_entity
+  end
+end
 
     private
 

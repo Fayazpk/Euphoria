@@ -36,8 +36,7 @@ class Admin::UsersController < ApplicationController
   end
 
   def destroy
-    @user = User.find_by(id: params[:id]) # Use find_by to avoid exceptions
-  
+    @user = User.find_by(id: params[:id])
     if @user
       @user.destroy
       flash[:notice] = "User was successfully deleted."
@@ -49,8 +48,7 @@ class Admin::UsersController < ApplicationController
   end
 
   def toggle_block
-    @user = User.find_by(id: params[:id]) # Use find_by to avoid exceptions
-
+    @user = User.find_by(id: params[:id]) 
     if @user
       @user.update(is_blocked: !@user.is_blocked)
       status = @user.is_blocked ? 'blocked' : 'unblocked'

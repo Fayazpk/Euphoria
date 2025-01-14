@@ -1,14 +1,14 @@
 Rails.application.routes.draw do
+ 
   # OmniAuth routes
   get "/auth/google_oauth2/callback", to: "sessions#oauth_callback"
   get "/auth/failure", to: "sessions#failure"
   get "/auth/google_oauth2", to: "sessions#oauth_request", as: :oauth_request
 
-  # Session routes
+
   resource :session, only: [ :new, :create, :destroy ]
   delete "/logout", to: "sessions#destroy", as: :logout
 
-  # Registration routes
   resources :registrations, only: [ :new, :create ] do
     member do
       get "verify_otp"
@@ -17,19 +17,29 @@ Rails.application.routes.draw do
     end
   end
   get "search", to: "application#search"
+resources :countries
+  
 
-  namespace :usermodule do
-    
-    resources :orders, only: [ :index, :show, :update ] do
+namespace :usermodule do
+    resource :wallet, only: [:show] do
+      member do
+        post :add_money 
+      end
+    end
+    resources :orders, only: [:index, :show, :update] do
       patch :cancel, on: :member
       patch :update_address, on: :member
+      member do
+        post :request_return
+      end
     end
+    
 
     resource :cart, only: [ :show, :destroy ] do
       post "add_to_cart", on: :collection
     end
-
-    resources :checkouts, only: [ :new, :create, :edit, :update ] do
+    
+    resources :checkouts, only: [:new, :create, :edit, :update] do
       collection do
         post :apply_coupon
       end
@@ -37,6 +47,10 @@ Rails.application.routes.draw do
         get :confirmation, as: :order_confirmation
         patch :update_status
         patch :confirm_payment
+        
+        post :razorpay_callback
+        get :razorpay_success
+        get :razorpay_failure
       end
     end
 
@@ -50,18 +64,17 @@ Rails.application.routes.draw do
     end
 
     resources :home, only: [ :index ]
-
-    # Add standalone products resource for general search
+    resources :wishlists, only: [:index, :create, :destroy]
     resources :products, only: [ :index ] do
       get :search, on: :collection
     end
 
-    # Modified categories structure
+    
     resources :categories, only: [ :index, :show ] do
       resources :subcategories, only: [ :index, :show ] do
         resources :products, only: [ :index, :show ] do
           collection do
-            get :search  
+            get :search
           end
           resources :productviews, only: [ :index ]
         end
@@ -70,8 +83,14 @@ Rails.application.routes.draw do
   end
 
 
-  # Admin namespace
+
   namespace :admin do
+    resources :coupons
+    resources :dashboard, only: [:index] do
+      collection do
+        get :sales_report
+      end
+    end
     resources :users do
       member do
         patch :toggle_block
@@ -82,6 +101,8 @@ Rails.application.routes.draw do
         patch :cancel
         patch :edit_address
         patch :update_address
+        patch :approve_return
+        patch :reject_return
       end
   end
 

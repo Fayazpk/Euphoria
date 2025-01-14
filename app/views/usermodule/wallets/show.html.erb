@@ -1,0 +1,132 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <!-- Wallet Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-2xl font-bold text-gray-800">My Wallet</h1>
+        <p class="text-sm text-gray-500 mt-1">Manage your wallet balance and view transactions</p>
+      </div>
+      <div class="text-right bg-gray-50 p-4 rounded-lg">
+        <p class="text-gray-600 text-sm mb-1">Current Balance</p>
+        <p class="text-3xl font-bold text-green-600" data-testid="wallet-balance">
+          ₹<%= number_with_precision(@wallet.balance, precision: 2) %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Add Money Form -->
+    <div class="bg-gray-50 rounded-lg p-6 mb-8">
+      <h2 class="text-lg font-semibold mb-4 flex items-center">
+        <i class="fas fa-wallet mr-2"></i>
+        Add Money to Wallet
+      </h2>
+      <%= form_tag add_money_usermodule_wallet_path, 
+          method: :post, 
+          data: { 
+            turbo: false,
+            controller: "wallet",
+            action: "submit->wallet#validateForm"
+          }, 
+          class: "space-y-4" do %>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div class="flex-1 w-full">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+              <%= number_field_tag :amount, nil, 
+                  class: "w-full rounded-lg border-gray-300 pl-8 focus:border-blue-500 focus:ring-blue-500",
+                  placeholder: "Enter amount",
+                  min: 1,
+                  step: "0.01",
+                  required: true,
+                  data: { 
+                    wallet_target: "amount",
+                    testid: "amount-input"
+                  } %>
+            </div>
+            <div data-wallet-target="error" class="text-red-500 text-sm mt-1 hidden"></div>
+          </div>
+          <%= submit_tag "Add Money", 
+              class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors w-full md:w-auto",
+              data: { 
+                disable_with: '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...',
+                testid: "submit-button"
+              } %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Transaction History -->
+    <div>
+      <h2 class="text-lg font-semibold mb-4 flex items-center">
+        <i class="fas fa-history mr-2"></i>
+        Transaction History
+      </h2>
+      <div class="overflow-x-auto bg-gray-50 rounded-lg">
+        <% if @transactions.any? %>
+          <table class="min-w-full divide-y divide-gray-200" data-testid="transactions-table">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @transactions.each do |transaction| %>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <%= transaction.created_at.strftime("%b %d, %Y %I:%M %p") %>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900">
+                    <%= transaction.description %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          <%= transaction.transaction_type == 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                      <%= transaction.transaction_type.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium 
+                      <%= transaction.transaction_type == 'credit' ? 'text-green-600' : 'text-red-600' %>">
+                    <%= transaction.transaction_type == 'credit' ? '+' : '-' %>
+                    ₹<%= number_with_precision(transaction.amount, precision: 2) %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <div class="text-center py-12 px-4" data-testid="no-transactions">
+            <div class="text-gray-400 mb-3">
+              <i class="fas fa-receipt text-4xl"></i>
+            </div>
+            <p class="text-gray-500 text-lg">No transactions yet</p>
+            <p class="text-gray-400 text-sm mt-1">Your transaction history will appear here</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flash Messages -->
+<% if flash.any? %>
+  <div class="fixed bottom-4 right-4 z-50" id="flash-messages">
+    <% flash.each do |type, message| %>
+      <div class="<%= type == 'notice' ? 'bg-green-500' : 'bg-red-500' %> text-white px-6 py-4 rounded-lg shadow-lg mb-4 flex items-center"
+           data-controller="flash"
+           data-action="click->flash#dismiss">
+        <% if type == 'notice' %>
+          <i class="fas fa-check-circle mr-2"></i>
+        <% else %>
+          <i class="fas fa-exclamation-circle mr-2"></i>
+        <% end %>
+        <%= message %>
+        <button class="ml-4 text-white hover:text-gray-200 focus:outline-none">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    <% end %>
+  </div>
+<% end %>

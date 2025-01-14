@@ -1,0 +1,51 @@
+<%= form_with(model: [:admin, admin_coupon]) do |form| %>
+  <% if admin_coupon.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(admin_coupon.errors.count, "error") %> prohibited this coupon from being saved:</h2>
+      <ul>
+        <% admin_coupon.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :code %>
+    <%= form.text_field :code %>
+  </div>
+
+  <div>
+    <%= form.label :discount %>
+    <%= form.number_field :discount, step: :any %>
+  </div>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.label :valid_from %>
+    <%= form.date_field :valid_from %>
+  </div>
+
+  <div>
+    <%= form.label :valid_until %>
+    <%= form.date_field :valid_until %>
+  </div>
+
+  <div>
+    <%= form.label :max_usage %>
+    <%= form.number_field :max_usage %>
+  </div>
+
+  <div>
+    <%= form.label :status %>
+    <%= form.check_box :status %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

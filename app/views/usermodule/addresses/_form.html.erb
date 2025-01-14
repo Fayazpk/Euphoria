@@ -13,72 +13,39 @@
   <div class="form-wrapper" data-controller="location">
     <div class="grid grid-cols-1 gap-6">
 
+      <!-- First Name Field -->
       <div class="field">
         <%= form.label :first_name, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.text_field :first_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
+      <!-- Last Name Field -->
       <div class="field">
         <%= form.label :last_name, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.text_field :last_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
+      <!-- Building Name Field -->
       <div class="field">
         <%= form.label :building_name, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.text_field :building_name, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
+      <!-- Street Address Field -->
       <div class="field">
         <%= form.label :street_address, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.text_field :street_address, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
 
-      <div class="field">
-        <%= form.label :country, class: "block text-sm font-semibold text-gray-700" %>
-        <%= form.select :country_id, 
-            @countries.pluck(:name, :id), 
-            { prompt: 'Select Country' }, 
-            { 
-              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
-              data: { 
-                location_target: "country",
-                action: "change->location#updateStates"
-              }
-            } 
-        %>
-      </div>
+      <!-- Country, State, and City Dropdowns -->
+      <%= render 'location_fields', form: form %>
 
-      <div class="field">
-        <%= form.label :state, class: "block text-sm font-semibold text-gray-700" %>
-        <%= form.select :state_id, 
-            @states.map { |s| [s.name, s.id] },
-            { prompt: 'Select State' }, 
-            { 
-              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
-              data: { 
-                location_target: "state",
-                action: "change->location#updateCities"
-              }
-            } 
-        %>
-      </div>
-
-      <div class="field">
-        <%= form.label :city, class: "block text-sm font-semibold text-gray-700" %>
-        <%= form.select :city_id, 
-            @cities.map { |c| [c.name, c.id] },
-            { prompt: 'Select City' }, 
-            { 
-              class: "form-select mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
-              data: { location_target: "city" }
-            } 
-        %>
-      </div>
-
+      <!-- Phone Field -->
       <div class="field">
         <%= form.label :phone, class: "block text-sm font-semibold text-gray-700" %>
         <%= form.text_field :phone, class: "form-input mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
       </div>
+      
     </div>
 
     <div class="mt-6">

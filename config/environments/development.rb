@@ -19,4 +19,5 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.eager_load = false
+  config.serve_static_assets = true
 end

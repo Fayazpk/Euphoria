@@ -1,0 +1,11 @@
+<% content_for :title, "New coupon" %>
+
+<h1>New coupon</h1>
+
+<%= render "form", admin_coupon: @admin_coupon %>
+
+<br>
+
+<div>
+  <%= link_to "Back to coupons", admin_coupons_path %>
+</div>

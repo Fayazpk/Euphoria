@@ -55,7 +55,40 @@
                 </p>
               </div>
             </div>
-
+    
+            <!-- Return Request Section -->
+          <% if @selected_order.return_request.present? %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Return Request Status</h5>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <p class="mb-1">Status: 
+            <span class="badge <%= case @selected_order.return_request.status
+                                when 'pending' then 'bg-warning'
+                                when 'completed' then 'bg-success'
+                                when 'approved' then 'bg-info'
+                                when 'rejected' then 'bg-danger'
+                                else 'bg-secondary'
+                                end %>">
+              <%= @selected_order.return_request.status.capitalize %>
+            </span>
+          </p>
+          <p class="mb-1">Reason: <%= @selected_order.return_request.reason %></p>
+          <small class="text-muted">
+            Requested on: <%= @selected_order.return_request.created_at.strftime('%B %d, %Y') %>
+          </small>
+        </div>
+        <% if @selected_order.return_request.completed? %>
+          <div class="text-success">
+            <i class="bi bi-check-circle-fill"></i>
+            <small>Refunded to wallet</small>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
             <!-- Current Shipping Address -->
             <div class="card mb-4">
               <div class="card-body">
@@ -78,9 +111,9 @@
                   <div class="col-md-6">
                     <p class="mb-1">
                       <i class="bi bi-globe"></i>
-                      <%= @selected_order.address.city.name %>, 
-                      <%= @selected_order.address.state.name %>, 
-                      <%= @selected_order.address.country.name %>
+                      <%#= @selected_order.address.city.name %>, 
+                      <%#= @selected_order.address.state.name %>, 
+                      <%#= @selected_order.address.country.name %>
                     </p>
                     <p class="mb-1">
                       <i class="bi bi-telephone"></i>
@@ -131,38 +164,7 @@
                       </div>
                     </div>
 
-                    <div class="col-md-4">
-                      <div class="form-floating">
-                        <%= f.select :city_id, 
-                                   City.all.collect { |c| [c.name, c.id] }, 
-                                   { include_blank: 'Select City' }, 
-                                   class: 'form-select',
-                                   required: true %>
-                        <%= f.label :city_id, "City" %>
-                      </div>
-                    </div>
-
-                    <div class="col-md-4">
-                      <div class="form-floating">
-                        <%= f.select :state_id, 
-                                   State.all.collect { |s| [s.name, s.id] }, 
-                                   { include_blank: 'Select State' }, 
-                                   class: 'form-select',
-                                   required: true %>
-                        <%= f.label :state_id, "State" %>
-                      </div>
-                    </div>
-
-                    <div class="col-md-4">
-                      <div class="form-floating">
-                        <%= f.select :country_id, 
-                                   Country.all.collect { |c| [c.name, c.id] }, 
-                                   { include_blank: 'Select Country' }, 
-                                   class: 'form-select',
-                                   required: true %>
-                        <%= f.label :country_id, "Country" %>
-                      </div>
-                    </div>
+                   
 
                     <div class="col-12">
                       <div class="form-floating">
@@ -173,9 +175,10 @@
                   </div>
 
                   <div class="mt-4">
-                    <%= f.submit "Update Address", 
-                                class: 'btn btn-primary',
-                                disabled: @selected_order.status == 'shipped' %>
+                  <%= f.submit "Update Address", 
+                              class: 'btn btn-primary',
+                              disabled: ['shipped', 'delivered', 'cancelled'].include?(@selected_order.status) %>
+                </div>
                     
                     <% if @selected_order.status == 'shipped' %>
                       <small class="text-muted d-block mt-2">

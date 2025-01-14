@@ -1,0 +1,32 @@
+<div>
+  <!-- Country Dropdown -->
+  <label for="countrySelect">Country:</label>
+  <select id="countrySelect" class="form-select mt-1 block w-full">
+    <option value="">Select Country</option>
+    <% Country.pluck(:name, :id).each do |name, id| %>
+      <option value="<%= id %>"><%= name %></option>
+    <% end %>
+  </select>
+</div>
+
+<div>
+  <!-- State Dropdown -->
+  <label for="stateSelect">State:</label>
+  <select id="stateSelect" class="form-select mt-1 block w-full" disabled>
+    <option value="">Select State</option>
+    <% State.pluck(:name, :id).each do |name, id| %>
+       <option value="<%= id %>"><%= name %></option>
+    <% end %>
+  </select>
+</div>
+
+<div>
+  <!-- City Dropdown -->
+  <label for="citySelect">City:</label>
+  <select id="citySelect" class="form-select mt-1 block w-full" disabled>
+    <option value="">Select City</option>
+    <% City.pluck(:name, :id).each do |name, id| %>
+      <option value="<%= id %>"><%= name %></option>
+   <% end %>
+  </select>
+</div>

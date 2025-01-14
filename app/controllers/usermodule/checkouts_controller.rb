@@ -2,13 +2,13 @@ module Usermodule
   class CheckoutsController < ApplicationController
     before_action :authenticate_user!
     before_action :set_cart
-    before_action :ensure_cart_not_empty
-    before_action :load_addresses, only: %i[new create]
-    
+    before_action :ensure_cart_not_empty, except: [:razorpay_callback]
+    before_action :load_addresses, only: [:new, :create]
+    before_action :set_checkout, only: [:razorpay_callback, :show]
 
     def new
       Rails.logger.info "Initializing checkout for user: #{current_user.id}"
-      @checkout = Checkout.new
+      @checkout = Checkout.new(cart: @cart, user: current_user)
       calculate_totals
     rescue StandardError => e
       handle_error('checkout initialization', e, usermodule_cart_path)
@@ -18,49 +18,143 @@ module Usermodule
       ActiveRecord::Base.transaction do
         calculate_totals
         @checkout = build_checkout
-    
+
         if @checkout.save
           Rails.logger.info "Checkout saved successfully with ID: #{@checkout.id}"
 
-          process_payment
-          clear_cart
-          redirect_to usermodule_cart_path, notice: 'Order placed successfully!'
-          
+          case @checkout.payment_method
+          when 'razorpay'
+            handle_razorpay_payment
+          when 'wallet'
+            handle_wallet_payment
+          else
+            handle_cod_payment
+          end
         else
-          Rails.logger.error "Checkout save failed: #{@checkout.errors.full_messages}"
-          flash.now[:alert] = @checkout.errors.full_messages.to_sentence
-          load_addresses
-          render :new, status: :unprocessable_entity
+          handle_failed_checkout
         end
+      rescue StandardError => e
+        handle_checkout_error(e)
       end
-    rescue StandardError => e
-      Rails.logger.error "Checkout creation failed: #{e.message}\nBacktrace: #{e.backtrace[0..5].join("\n")}"
-      flash.now[:alert] = 'An error occurred. Please try again.'
-      load_addresses
-      render :new, status: :unprocessable_entity
     end
 
-    def apply_coupon
-      calculate_totals
-      @discount = calculate_coupon_discount(params[:coupon_code])
+    def show
+      @order = current_user.checkouts.find(params[:id])
+      @checkout = current_user.checkouts.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      redirect_with_error('Checkout not found', usermodule_cart_path)
+    end
 
-      if @discount.positive?
-        Rails.logger.info "Coupon applied successfully: #{params[:coupon_code]}, Discount: #{@discount}"
-        render json: { 
-          discount: @discount,
-          total: calculate_final_total,
-          message: "Coupon applied successfully!"
+    def razorpay_callback
+      Rails.logger.info "Received Razorpay callback for checkout: #{@checkout.id}"
+      
+      begin
+        # Extract payment data from the nested params
+        payment_data = {
+          'razorpay_payment_id' => params.dig(:checkout, :razorpay_payment_id),
+          'razorpay_order_id' => params.dig(:checkout, :razorpay_order_id),
+          'razorpay_signature' => params.dig(:checkout, :razorpay_signature)
         }
-      else
-        Rails.logger.error "Invalid Coupon Code: #{params[:coupon_code]}"
-        render json: { 
-          error: "Invalid coupon code",
-          total: calculate_final_total 
-        }, status: :unprocessable_entity
+    
+        Rails.logger.debug("Received Razorpay callback params: #{payment_data.inspect}")
+    
+        if payment_data.values.any?(&:blank?)
+          missing = payment_data.select { |k, v| v.blank? }.keys
+          Rails.logger.error "Missing Razorpay parameters: #{missing.join(', ')}"
+          return render json: { 
+            success: false, 
+            error: "Missing required parameters: #{missing.join(', ')}" 
+          }, status: :unprocessable_entity
+        end
+    
+        if @checkout.verify_razorpay_payment(payment_data)
+          Rails.logger.info "Payment verification successful for checkout: #{@checkout.id}"
+          clear_cart
+          render json: {
+            success: true,
+            message: "Payment successful",
+            redirect_url: usermodule_order_path(@checkout)
+          }
+        else
+          Rails.logger.error "Payment verification failed for checkout: #{@checkout.id}"
+          render json: {
+            success: false,
+            error: "Payment verification failed",
+            messages: @checkout.errors.full_messages
+          }, status: :unprocessable_entity
+        end
+      rescue => e
+        Rails.logger.error "Razorpay callback error: #{e.class} - #{e.message}\n#{e.backtrace.join("\n")}"
+        render json: {
+          success: false,
+          error: "Payment processing failed. Please contact support."
+        }, status: :internal_server_error
       end
     end
 
     private
+
+    def razorpay_params
+      params.permit(
+        :razorpay_payment_id,
+        :razorpay_order_id,
+        :razorpay_signature,
+        checkout: [:razorpay_payment_id, :razorpay_order_id, :razorpay_signature]
+      )
+    end
+
+    def set_cart
+      @cart = current_user.cart
+      redirect_with_error('Cart not found', root_path) unless @cart
+    end
+
+    def set_checkout
+      @checkout = current_user.checkouts.find_by(id: params[:id])
+      render_error("Checkout not found", :not_found) unless @checkout
+    end
+
+    def ensure_cart_not_empty
+      redirect_with_error('Your cart is empty', usermodule_cart_path) if @cart.orderables.empty?
+    end
+
+    def load_addresses
+      @addresses = current_user.addresses
+      redirect_with_error('Please add a delivery address to continue with checkout', new_usermodule_address_path) if @addresses.empty?
+    end
+
+    def handle_razorpay_payment
+      order = @checkout.create_razorpay_order
+      if order
+        render json: {
+          checkout_id: @checkout.id,
+          razorpay_order_id: order.id,
+          amount: order.amount,
+          currency: order.currency
+        }
+      else
+        render json: { error: @checkout.errors.full_messages.join(', ') }, status: :unprocessable_entity
+      end
+    end
+
+    def handle_cod_payment
+      process_payment
+      clear_cart
+      redirect_to usermodule_order_path(@checkout), notice: 'Order placed successfully!'
+    end
+
+    def process_payment
+      raise 'Invalid payment method' unless valid_payment_method?
+
+      @checkout.update!(
+        payment_status: 'pending',
+        status: 'processing',
+        transaction_id: generate_transaction_id
+      )
+    end
+
+    def valid_payment_method?
+      Checkout::PAYMENT_METHODS.include?(checkout_params[:payment_method].to_s.downcase)
+    end
 
     def clear_cart
       Rails.logger.info "Clearing cart for user: #{current_user.id}"
@@ -80,42 +174,6 @@ module Usermodule
 
       Rails.logger.info "Building checkout with attributes: #{checkout_attributes.inspect}"
       Checkout.new(checkout_attributes)
-    end
-
-    def process_payment
-      raise 'Invalid payment method' unless valid_payment_method?
-
-      @checkout.update!(
-        payment_status: 'pending',
-        status: 'processing',
-        transaction_id: generate_transaction_id
-      )
-    end
-
-    def valid_payment_method?
-      method = checkout_params[:payment_method].to_s.downcase
-      Rails.logger.info "Validating payment method: #{method}"
-      Checkout::PAYMENT_METHODS.include?(method)
-    end
-
-    def set_cart
-      @cart = current_user.cart
-      redirect_with_error('Cart not found', root_path) unless @cart
-    end
-
-    def ensure_cart_not_empty
-      return unless @cart.orderables.empty?
-      redirect_with_error('Your cart is empty', usermodule_cart_path)
-    end
-
-    def load_addresses
-      @addresses = current_user.addresses
-      if @addresses.empty?
-        redirect_with_error(
-          'Please add a delivery address to continue with checkout',
-          new_usermodule_address_path
-        )
-      end
     end
 
     def calculate_totals
@@ -152,15 +210,28 @@ module Usermodule
     end
 
     def calculate_final_total
-      @total ||= 0  # Ensure @total is set
-      @discount ||= 0  # Ensure @discount is set to 0 if it's nil
-      
-      # Now perform the calculation safely
+      @total ||= 0
+      @discount ||= 0
       (@total - @discount).round(2)
     end
 
-    def generate_transaction_id
-      "TXN#{Time.current.to_i}#{SecureRandom.hex(4).upcase}"
+    def handle_failed_checkout
+      Rails.logger.error "Checkout save failed: #{@checkout.errors.full_messages}"
+      flash.now[:alert] = @checkout.errors.full_messages.to_sentence
+      load_addresses
+      render :new, status: :unprocessable_entity
+    end
+
+    def handle_checkout_error(error)
+      Rails.logger.error "Checkout creation failed: #{error.message}\nBacktrace: #{error.backtrace[0..5].join("\n")}"
+      flash.now[:alert] = 'An error occurred. Please try again.'
+      load_addresses
+      render :new, status: :unprocessable_entity
+    end
+
+    def handle_error(type, error, path)
+      Rails.logger.error "#{type} failed: #{error.message}"
+      redirect_to path, alert: 'An error occurred. Please try again.'
     end
 
     def redirect_with_error(message, path)
@@ -168,20 +239,16 @@ module Usermodule
       redirect_to path, alert: message
     end
 
-    def handle_error(action, error, path = nil, render_action: nil, status: nil, json: false)
-      Rails.logger.error "Error during #{action}: #{error.message}"
-      if json
-        render json: { status: 'error', message: 'An error occurred' }, status: :unprocessable_entity
-      elsif path
-        redirect_to path, alert: 'An error occurred. Please try again.'
-      else
-        flash.now[:alert] = 'An error occurred. Please try again.'
-        render render_action, status: status
-      end
+    def render_error(message, status = :unprocessable_entity)
+      render json: { success: false, error: message }, status: status
     end
 
     def checkout_params
       params.require(:checkout).permit(:address_id, :payment_method, :coupon_code)
+    end
+
+    def generate_transaction_id
+      "TXN#{Time.current.to_i}#{SecureRandom.hex(4).upcase}"
     end
   end
 end

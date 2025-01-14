@@ -1,128 +1,291 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Admin Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #6a11cb;
-            --secondary-color: #2575fc;
-            --light-bg: #f4f7fa;
-        }
+<!-- Top Header -->
+<div class="top-header d-flex justify-content-between align-items-center">
+    <h2 class="mb-0">Dashboard</h2>
+    <div>
+        <%= button_to "Logout", session_path, method: :delete, class: "btn btn-gradient" %>
+    </div>
+</div>
 
-        body {
-            background-color: var(--light-bg);
-            font-family: 'Arial', sans-serif;
-        }
-
-        .content-wrapper {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .dashboard-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .top-header {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            padding: 15px 20px;
-            margin-bottom: 20px;
-        }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-        }
-
-        .btn-gradient:hover {
-            opacity: 0.9;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Content Wrapper -->
-   
-        <div class="container-fluid">
-            <!-- Top Header -->
-            <div class="top-header d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">Dashboard</h2>
-                <div>
-                    <%= button_to"Logout", session_path, method: :delete, class: "btn btn-gradient" %>
+<!-- Sales Report Section -->
+<div class="card dashboard-card mt-4">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Sales Report</h4>
+        
+        <!-- Date Range Selector -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" data-range="daily">Daily</button>
+                    <button type="button" class="btn btn-outline-primary" data-range="weekly">Weekly</button>
+                    <button type="button" class="btn btn-outline-primary" data-range="monthly">Monthly</button>
+                    <button type="button" class="btn btn-outline-primary" data-range="yearly">Yearly</button>
+                    <button type="button" class="btn btn-outline-primary" data-range="custom">Custom</button>
                 </div>
             </div>
+            
+            <!-- Custom Date Range -->
+            <div class="col-md-4 custom-date-range" style="display: none;">
+                <div class="input-group">
+                    <input type="date" class="form-control" id="start_date">
+                    <span class="input-group-text">to</span>
+                    <input type="date" class="form-control" id="end_date">
+                    <button class="btn btn-primary" id="apply-custom-range">Apply</button>
+                </div>
+            </div>
+        </div>
 
-            <!-- Dashboard Cards -->
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="card dashboard-card card-hover">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="text-muted">Total Products</h5>
-                                <h3 class="mb-0">254</h3>
-                            </div>
-                            <i class="fas fa-box text-primary fa-2x"></i>
-                        </div>
+        <!-- Sales Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Sales</h5>
+                        <h3 class="mb-0" id="total-sales">$0</h3>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card card-hover">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="text-muted">Total Orders</h5>
-                                <h3 class="mb-0">127</h3>
-                            </div>
-                            <i class="fas fa-shopping-cart text-success fa-2x"></i>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Orders</h5>
+                        <h3 class="mb-0" id="total-orders">0</h3>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card card-hover">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="text-muted">Total Users</h5>
-                                <h3 class="mb-0">1,245</h3>
-                            </div>
-                            <i class="fas fa-users text-warning fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card card-hover">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="text-muted">Total Revenue</h5>
-                                <h3 class="mb-0">$52,456</h3>
-                            </div>
-                            <i class="fas fa-dollar-sign text-info fa-2x"></i>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Discount</h5>
+                        <h3 class="mb-0" id="total-discount">$0</h3>
                     </div>
                 </div>
             </div>
         </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        <!-- Sales Graph -->
+        <div class="card">
+            <div class="card-body">
+                <canvas id="salesChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Sales Report Table -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Sales Report Table</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sales</th>
+                            <th>Orders</th>
+                            <th>Discount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-report-table">
+                        <!-- Rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let salesChart;
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    
+    // Initialize Chart
+    function initChart(labels, data) {
+        if (salesChart) {
+            salesChart.destroy();
+        }
+        
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: data,
+                    borderColor: '#2575fc',
+                    backgroundColor: 'rgba(37, 117, 252, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#2575fc',
+                    pointHoverBackgroundColor: '#2575fc'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `Sales: $${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rs.' + value.toFixed(2);
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        }).format(amount);
+    }
+
+    // Fetch Report Data
+    function fetchReportData(range, startDate = null, endDate = null) {
+        // Show loading state
+        document.querySelectorAll('[data-range]').forEach(btn => btn.disabled = true);
+        
+        let url = '/admin/dashboard/sales_report?range=' + range;
+        if (startDate && endDate) {
+            url += `&start_date=${startDate}&end_date=${endDate}`;
+        }
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                try {
+                    // Update summary cards with formatted values
+                    document.getElementById('total-sales').textContent = 
+                        formatCurrency(data.total_sales || 0);
+                    document.getElementById('total-orders').textContent = 
+                        data.orders || 0;
+                    document.getElementById('total-discount').textContent = 
+                        formatCurrency(data.total_discount || 0);
+
+                    // Format dates for chart
+                    const labels = Object.keys(data.sales_by_date || {}).map(date => {
+                        return new Date(date).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                    });
+                    const values = Object.values(data.sales_by_date || {});
+
+                    initChart(labels, values);
+
+                    // Update Sales Report Table
+const tableBody = document.getElementById('sales-report-table');
+tableBody.innerHTML = ''; // Clear the previous rows
+Object.keys(data.sales_by_date || {}).forEach(date => {
+  const row = document.createElement('tr');
+  
+  // Handle missing or undefined data with a fallback value
+  const sales = data.sales_by_date[date]?.sales || 0;
+  const orders = data.sales_by_date[date]?.orders || 0;
+  const discount = data.sales_by_date[date]?.discount || 0;
+
+  row.innerHTML = `
+    <td>${new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+    <td>${formatCurrency(sales)}</td>
+    <td>${orders}</td>
+    <td>${formatCurrency(discount)}</td>
+  `;
+  
+  tableBody.appendChild(row);
+});
+
+                    // Update active state of range buttons
+                    document.querySelectorAll('[data-range]').forEach(button => {
+                        button.classList.remove('active', 'btn-primary');
+                        button.classList.add('btn-outline-primary');
+                    });
+                    const activeButton = document.querySelector(`[data-range="${range}"]`);
+                    if (activeButton) {
+                        activeButton.classList.remove('btn-outline-primary');
+                        activeButton.classList.add('active', 'btn-primary');
+                    }
+
+                } catch (error) {
+                    console.error('Error processing data:', error);
+                    alert('Error processing report data');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching report data:', error);
+                alert('Error fetching report data');
+            })
+            .finally(() => {
+                // Re-enable buttons
+                document.querySelectorAll('[data-range]').forEach(btn => btn.disabled = false);
+            });
+    }
+
+    // Event Listeners
+    document.querySelectorAll('[data-range]').forEach(button => {
+        button.addEventListener('click', function() {
+            const range = this.dataset.range;
+            
+            if (range === 'custom') {
+                document.querySelector('.custom-date-range').style.display = 'block';
+            } else {
+                document.querySelector('.custom-date-range').style.display = 'none';
+                fetchReportData(range);
+            }
+        });
+    });
+
+    document.getElementById('apply-custom-range').addEventListener('click', function() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('Start date must be before end date');
+            return;
+        }
+
+        fetchReportData('custom', startDate, endDate);
+    });
+
+    // Initial load
+    fetchReportData('monthly');
+});
+</script>

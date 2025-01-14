@@ -2,15 +2,17 @@ module Admin
   class OrdersController < ApplicationController
     layout "admin"
 
-    before_action :set_order, only: [ :show, :update, :cancel, :edit_address ]
-
+    
+    before_action :set_order, only: [:show, :update, :cancel, :edit_address, :approve_return, :reject_return]
     def index
-      @orders = Checkout.includes(:user, :address)
+      @orders = Checkout.includes(:user, :address, :return_request)
                        .order(created_at: :desc)
                        .page(params[:page])
                        .per(20)
 
-      @orders = filter_orders(@orders) if params[:status].present?
+                       
+
+      @orders = filter_orders(@orders) 
     end
 
     def show
@@ -68,27 +70,123 @@ module Admin
       end
     end
 
+    def approve_return
+      @return_request = @order.return_request
+      
+      if @return_request&.pending?
+        ActiveRecord::Base.transaction do
+          @return_request.update!(status: 'approved')
+          
+         
+          wallet = @order.user.wallet
+          refund_amount = @order.total_price
+          
+          if wallet.add_money(refund_amount, "Refund for order ##{@order.id}")
+            @return_request.update!(status: 'completed')
+            redirect_to admin_orders_path, notice: 'Return request approved and amount refunded'
+          else
+            raise ActiveRecord::Rollback
+            redirect_to admin_orders_path, alert: 'Failed to process refund'
+          end
+        end
+      else
+        redirect_to admin_orders_path, alert: 'Invalid return request'
+      end
+    end
+    
+    def reject_return
+      @return_request = @order.return_request
+      
+      if @return_request&.pending? && @return_request.update(status: 'rejected')
+        redirect_to admin_orders_path, notice: 'Return request rejected'
+      else
+        redirect_to admin_orders_path, alert: 'Failed to reject return request'
+      end
+    end
+
+    def approve_return
+      @return_request = @order.return_request
+      
+      if @return_request&.pending?
+        ActiveRecord::Base.transaction do
+          @return_request.update!(status: 'approved')
+          
+          # Refund amount to user's wallet
+          wallet = @order.user.wallet
+          refund_amount = @order.total_price
+          
+          if wallet.add_money(refund_amount, "Refund for order ##{@order.id}")
+            @return_request.update!(status: 'completed')
+            redirect_to admin_orders_path, notice: 'Return request approved and amount refunded'
+          else
+            raise ActiveRecord::Rollback
+            redirect_to admin_orders_path, alert: 'Failed to process refund'
+          end
+        end
+      else
+        redirect_to admin_orders_path, alert: 'Invalid return request'
+      end
+    end
+
+    def reject_return
+      @return_request = @order.return_request
+      
+      if @return_request&.pending? && @return_request.update(status: 'rejected')
+        redirect_to admin_orders_path, notice: 'Return request rejected'
+      else
+        redirect_to admin_orders_path, alert: 'Failed to reject return request'
+      end
+    end
+
     private
 
     def set_order
       @order = Checkout.find(params[:id])
     end
-
     def filter_orders(orders)
-      case params[:status]
-      when "pending"
-        orders.where(status: "pending")
-      when "processing"
-        orders.where(status: "processing")
-      when "shipped"
-        orders.where(status: "shipped")
-      when "delivered"
-        orders.where(status: "delivered")
-      when "cancelled"
-        orders.where(status: "cancelled")
-      else
-        orders
-      end
+      orders = case params[:filter_status]
+               when "pending"
+                 orders.where(status: "pending")
+               when "processing"
+                 orders.where(status: "processing")
+               when "shipped"
+                 orders.where(status: "shipped")
+               when "delivered"
+                 orders.where(status: "delivered")
+               when "cancelled"
+                 orders.where(status: "cancelled")
+               else
+                 orders
+               end
+
+      orders = case params[:payment_status]
+               when "pending"
+                 orders.where(payment_status: "pending")
+               when "completed"
+                 orders.where(payment_status: "completed")
+               when "cancelled"
+                 orders.where(payment_status: "cancelled")
+               when "failed"
+                 orders.where(payment_status: "failed")
+               else
+                 orders
+               end
+
+      
+      orders = case params[:return_status]
+               when "pending"
+                 orders.joins(:return_request).where(return_requests: { status: "pending" })
+               when "approved"
+                 orders.joins(:return_request).where(return_requests: { status: "approved" })
+               when "rejected"
+                 orders.joins(:return_request).where(return_requests: { status: "rejected" })
+               when "completed"
+                 orders.joins(:return_request).where(return_requests: { status: "completed" })
+               else
+                 orders
+               end
+
+      orders
     end
 
     def valid_status_transition?(current_status, new_status)
@@ -103,7 +201,6 @@ module Admin
     end
 
     def process_status_update
-      # Update payment status for COD orders when delivered
       if params[:status] == "delivered" && @order.payment_method == "cod"
         @order.update_column(:payment_status, "completed")
       end

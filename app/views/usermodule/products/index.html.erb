@@ -3,121 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse our collection of <%= @subcategory.name %> products">
     <title>Collections | <%= @subcategory.name %></title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        @keyframes hover-card {
+            0% { transform: translateY(0) rotateX(0); }
+            100% { transform: translateY(-10px) rotateX(5deg); }
+        }
+        
         .product-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             perspective: 1000px;
+            transform-origin: center center;
         }
+        
         .product-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            animation: hover-card 0.3s forwards;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
+        
         .discount-badge {
-            background: linear-gradient(to right, #ff6b6b, #ff9900);
+            background: linear-gradient(135deg, #ff6b6b, #ff9900);
         }
+        
         .filter-sidebar {
             height: calc(100vh - 2rem);
             position: sticky;
             top: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+        }
+        
+        .filter-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .filter-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .filter-sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 3px;
+        }
+
+        .wishlist-btn:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        .product-image-placeholder {
+            background: linear-gradient(45deg, #f3f4f6 25%, #e5e7eb 25%, #e5e7eb 50%, #f3f4f6 50%, #f3f4f6 75%, #e5e7eb 75%, #e5e7eb 100%);
+            background-size: 20px 20px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .product-card {
+                animation: none;
+                transform: none;
+            }
         }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto px-4 py-8">
-        <!-- Breadcrumbs -->
-        <nav class="flex mb-6" aria-label="Breadcrumb">
-            <!-- Original breadcrumb code -->
-        </nav>
+        
+        
 
         <div class="flex flex-col md:flex-row gap-8">
             <!-- Filter Sidebar -->
-            <div class="md:w-64 flex-shrink-0">
+            <aside class="md:w-64 flex-shrink-0">
                 <div class="bg-white rounded-lg shadow-md p-6 filter-sidebar">
-                    <h3 class="text-lg font-semibold mb-4">Sort By</h3>
-                    <div class="space-y-3">
+                    <h2 class="text-lg font-semibold mb-4">Sort By</h2>
+                    <nav class="space-y-3">
+                        <% sort_options = {
+                            'price_asc' => { icon: 'sort-amount-down-alt', text: 'Price: Low to High' },
+                            'price_desc' => { icon: 'sort-amount-up', text: 'Price: High to Low' },
+                            'newest' => { icon: 'calendar-alt', text: 'Newest First' },
+                            'discount' => { icon: 'percent', text: 'Biggest Discount' }
+                        } %>
                         
-                        <%= link_to usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'price_asc'), 
-                            class: "block text-gray-600 hover:text-blue-600 #{params[:sort] == 'price_asc' ? 'text-blue-600 font-semibold' : ''}" do %>
-                            <i class="fas fa-sort-amount-down-alt mr-2"></i>Price: Low to High
+                        <% sort_options.each do |key, option| %>
+                            <%= link_to usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: key),
+                                class: "block text-gray-600 hover:text-blue-600 transition-colors #{params[:sort] == key ? 'text-blue-600 font-semibold' : ''}" do %>
+                                <i class="fas fa-<%= option[:icon] %> mr-2"></i><%= option[:text] %>
+                            <% end %>
                         <% end %>
-                        <%= link_to usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'price_desc'), 
-                            class: "block text-gray-600 hover:text-blue-600 #{params[:sort] == 'price_desc' ? 'text-blue-600 font-semibold' : ''}" do %>
-                            <i class="fas fa-sort-amount-up mr-2"></i>Price: High to Low
-                        <% end %>
-                        <%= link_to usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'newest'), 
-                            class: "block text-gray-600 hover:text-blue-600 #{params[:sort] == 'newest' ? 'text-blue-600 font-semibold' : ''}" do %>
-                            <i class="fas fa-calendar-alt mr-2"></i>Newest First
-                        <% end %>
-                        <%= link_to usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'discount'), 
-                            class: "block text-gray-600 hover:text-blue-600 #{params[:sort] == 'discount' ? 'text-blue-600 font-semibold' : ''}" do %>
-                            <i class="fas fa-percent mr-2"></i>Biggest Discount
-                        <% end %>
-                    </div>
+                    </nav>
                 </div>
-            </div>
+            </aside>
 
             <!-- Main Content -->
-            <div class="flex-1">
-                <!-- Sort Bar Mobile -->
+            <main class="flex-1">
+                <!-- Mobile Sort Bar -->
                 <div class="md:hidden mb-6">
-                    <select class="w-full p-2 border rounded-md" onchange="window.location.href=this.value">
-                        
-                        <option value="<%= usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'price_asc') %>"
-                            <%= params[:sort] == 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
-                        <option value="<%= usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'price_desc') %>"
-                            <%= params[:sort] == 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
-                        <option value="<%= usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'newest') %>"
-                            <%= params[:sort] == 'newest' ? 'selected' : '' %>>Newest First</option>
-                        <option value="<%= usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: 'discount') %>"
-                            <%= params[:sort] == 'discount' ? 'selected' : '' %>>Biggest Discount</option>
+                    <label for="sort-mobile" class="sr-only">Sort products</label>
+                    <select id="sort-mobile" 
+                            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            onchange="window.location.href=this.value">
+                        <% sort_options.each do |key, option| %>
+                            <option value="<%= usermodule_category_subcategory_products_path(@subcategory.category_id, @subcategory, sort: key) %>"
+                                    <%= params[:sort] == key ? 'selected' : '' %>><%= option[:text] %></option>
+                        <% end %>
                     </select>
                 </div>
 
                 <!-- Product Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
                     <% @products.each do |product| %>
-                        <%= link_to usermodule_category_subcategory_product_productviews_path(@subcategory.category, @subcategory, product), class: "contents" do %>
-                            <div class="product-card bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105 flex flex-col h-full">
-                                <div class="relative">
-                                    <% if product.images.any? %>
-                                        <%= image_tag(product.images.first, class: "w-full h-72 object-cover") %>
-                                    <% else %>
-                                        <div class="w-full h-72 bg-gray-200 flex items-center justify-center">
-                                            <i class="fas fa-image text-gray-400 text-6xl"></i>
-                                        </div>
-                                    <% end %>
-                                    <div class="absolute top-4 right-4 discount-badge text-white px-3 py-1 rounded-full text-sm font-bold">
-                                        <%= product.discount_percentage %>% OFF
+                        <article class="contents" role="listitem">
+                        <%= link_to usermodule_category_subcategory_product_productviews_path(@subcategory.category, @subcategory, product),
+                        :class => "group",
+                        "aria-label" => "View details for #{product.name}" do %>
+                                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden h-full">
+                                    <div class="relative">
+                                        <% if product.images.any? %>
+                                            <%= image_tag(product.images.first, 
+                                                        class: "w-full h-72 object-cover", 
+                                                        alt: product.name) %>
+                                        <% else %>
+                                            <div class="w-full h-72 product-image-placeholder flex items-center justify-center">
+                                                <i class="fas fa-image text-gray-400 text-6xl" aria-hidden="true"></i>
+                                            </div>
+                                        <% end %>
+                                        
+                                        <% if product.discount_percentage > 0 %>
+                                            <span class="absolute top-4 right-4 discount-badge text-white px-3 py-1 rounded-full text-sm font-bold" 
+                                                  role="text" 
+                                                  aria-label="<%= product.discount_percentage %>% discount">
+                                                <%= product.discount_percentage %>% OFF
+                                            </span>
+                                        <% end %>
+
+                                        <button type="button"
+                                                class="wishlist-btn absolute top-4 left-4 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors duration-200"
+                                                data-wishlist-button
+                                                data-product-id="<%= product.id %>"
+                                                data-wishlisted="<%= current_user&.wishlists&.exists?(product: product) %>"
+                                                aria-label="<%= current_user&.wishlists&.exists?(product: product) ? 'Remove from wishlist' : 'Add to wishlist' %>">
+                                            <i class="<%= current_user&.wishlists&.exists?(product: product) ? 'fas' : 'far' %> fa-heart <%= current_user&.wishlists&.exists?(product: product) ? 'text-red-500' : 'text-gray-600' %>" 
+                                               aria-hidden="true"></i>
+                                        </button>
                                     </div>
-                                    <button class="absolute top-4 left-4 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md">
-                                        <i class="far fa-heart text-gray-600"></i>
-                                    </button>
-                                </div>
-                                <div class="p-4 flex flex-col flex-grow">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-2"><%= product.name %></h3>
-                                    <p class="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow"><%= product.description %></p>
-                                    <div class="flex items-center justify-between mt-auto">
-                                        <div>
+
+                                    <div class="p-4 flex flex-col flex-grow">
+                                        <h3 class="text-lg font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                                            <%= product.name %>
+                                        </h3>
+                                        <p class="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+                                            <%= product.description %>
+                                        </p>
+                                        <div class="flex items-center justify-between mt-auto">
                                             <div class="flex items-center">
                                                 <span class="text-xl font-bold text-gray-900 mr-3">
-                                                    $<%= product.final_price %>
+                                                    $<%= number_with_precision(product.final_price, precision: 2) %>
                                                 </span>
-                                                <span class="line-through text-gray-400 text-sm">
-                                                    $<%= product.base_price %>
-                                                </span>
+                                                <% if product.discount_percentage > 0 %>
+                                                    <span class="line-through text-gray-400 text-sm">
+                                                        $<%= number_with_precision(product.base_price, precision: 2) %>
+                                                    </span>
+                                                <% end %>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        <% end %>
+                            <% end %>
+                        </article>
                     <% end %>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wishlistButtons = document.querySelectorAll('[data-wishlist-button]');
+            
+            wishlistButtons.forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const productId = this.dataset.productId;
+                    const isWishlisted = this.dataset.wishlisted === 'true';
+                    
+                    try {
+                        const response = await fetch('/usermodule/wishlists', {
+                            method: isWishlisted ? 'DELETE' : 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({ product_id: productId })
+                        });
+
+                        if (response.ok) {
+                            const heartIcon = this.querySelector('i');
+                            heartIcon.classList.toggle('fas');
+                            heartIcon.classList.toggle('far');
+                            heartIcon.classList.toggle('text-red-500');
+                            heartIcon.classList.toggle('text-gray-600');
+                            
+                            this.dataset.wishlisted = !isWishlisted;
+                            this.setAttribute('aria-label', 
+                                isWishlisted ? 'Add to wishlist' : 'Remove from wishlist'
+                            );
+                        }
+                    } catch (error) {
+                        console.error('Error updating wishlist:', error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

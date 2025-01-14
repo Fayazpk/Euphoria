@@ -2,25 +2,21 @@ class Admin::CategoriesController < ApplicationController
   layout 'admin'
   before_action :set_admin_category, only: %i[show edit update destroy]
 
-  # GET /admin/categories or /admin/categories.json
+  
   def index
     @admin_categories = Category.all
   end
 
-  # GET /admin/categories/1 or /admin/categories/1.json
   def show
   end
 
-  # GET /admin/categories/new
   def new
     @admin_category = Category.new
   end
 
-  # GET /admin/categories/1/edit
   def edit
   end
 
-  # POST /admin/categories or /admin/categories.json
   def create
     @admin_category = Category.new(admin_category_params)
 
@@ -35,7 +31,7 @@ class Admin::CategoriesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /admin/categories/1 or /admin/categories/1.json
+
   def update
     respond_to do |format|
       if @admin_category.update(admin_category_params)
@@ -48,7 +44,7 @@ class Admin::CategoriesController < ApplicationController
     end
   end
 
-  # DELETE /admin/categories/1 or /admin/categories/1.json
+
   def destroy
     @admin_category.destroy!
 
@@ -60,14 +56,12 @@ class Admin::CategoriesController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_admin_category
     @admin_category = Category.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_categories_path, alert: "Category not found."
   end
 
-  # Only allow a list of trusted parameters through.
   def admin_category_params
     params.require(:category).permit(:name, :description, :image)
   end

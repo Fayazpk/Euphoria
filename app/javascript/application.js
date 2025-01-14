@@ -3,21 +3,21 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "channels"
 
-// app/javascript/packs/application.js
 
-// Import required libraries
+
+
 import 'bootstrap'
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Initialize Bootstrap components
+
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
 
-  // Price calculation logic
+  
   const setupPriceCalculation = () => {
     const basePriceInput = document.getElementById("base_price");
     const discountInput = document.getElementById("discount_percentage");
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
     discountInput.addEventListener("input", calculateFinalPrice);
   };
 
-  // Image cropper logic
+  
   const setupImageCropper = () => {
     let cropper = null;
     let currentImageInput = null;
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     };
 
-    // Handle file selection
+    
     document.querySelectorAll('.image-input').forEach(input => {
       input.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     });
 
-    // Handle crop action
+  
     cropButton.addEventListener('click', () => {
       if (!cropper || !currentImageInput) return;
 
@@ -113,26 +113,26 @@ document.addEventListener("DOMContentLoaded", function() {
       });
 
       croppedCanvas.toBlob((blob) => {
-        // Create File object
+        
         const fileName = currentImageInput.files[0].name;
         const croppedFile = new File([blob], fileName, { 
           type: 'image/jpeg',
           lastModified: new Date().getTime()
         });
 
-        // Update file input
+        
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(croppedFile);
         currentImageInput.files = dataTransfer.files;
 
-        // Update preview
+        
         const previewImage = currentImageInput.parentElement.querySelector('.preview-image');
         const croppedImageInput = currentImageInput.parentElement.querySelector('.cropped-image-input');
         
         previewImage.src = URL.createObjectURL(blob);
         previewImage.style.display = 'block';
 
-        // Store cropped image data
+        
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onloadend = () => {
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }, 'image/jpeg', 0.9);
     });
 
-    // Modal cleanup
+    
     modalElement.addEventListener('hidden.bs.modal', () => {
       if (cropper) {
         cropper.destroy();
@@ -159,14 +159,13 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
-    // Modal close button
+    
     const closeButton = modalElement.querySelector('.btn-close, .btn-secondary');
     if (closeButton) {
       closeButton.addEventListener('click', () => cropperModal.hide());
     }
   };
 
-  // Initialize all components
   setupPriceCalculation();
   setupImageCropper();
 });

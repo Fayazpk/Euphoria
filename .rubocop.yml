@@ -1,8 +1,276 @@
 # Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+#inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+AllCops:
+  TargetRubyVersion: 3.3.5 
+  Exclude:
+    - bin/**/*
+    - config/boot.rb
+    - config/deploy.rb
+    - config/*
+    - config/deploy/*
+    - db/schema.rb
+    - script/**/*
+    - tmp/**/*
+    - vendor/**/*
+    - Rakefile
+    - Gemfile
+    - Gemfile.lock
+    - lib/**/*
+    - db/**/*
+    - spec/rails_helper.rb
+    - spec/spec_helper.rb
+  DisplayCopNames: true
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Style/FormatStringToken:
+  Enabled: false
+Style/OptionalArguments:
+  Enabled: false
+Layout/SpaceBeforeComma:
+  Enabled: false
+Layout/SpaceBeforeSemicolon:
+  Enabled: false
+Style/AccessModifierDeclarations:
+  Enabled: false
+Style/Alias:
+  Enabled: false
+Style/BeginBlock:
+  Enabled: false
+Style/CaseEquality:
+  Enabled: false
+Documentation:
+  Enabled: false
+Style/EmptyMethod:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 400
+Metrics/ClassLength:
+  Max: 1000
+Naming/VariableNumber:
+  EnforcedStyle: 'snake_case'
+Naming/FileName:
+  Enabled: false
+Metrics/BlockNesting:
+  Enabled: false
+Style/Lambda:
+  Enabled: false
+Metrics/BlockLength:
+  Max: 500
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*'
+    - 'config/routes.rb'
+    - 'app/helpers/builders/*'
+Layout/TrailingEmptyLines:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Style/SymbolArray:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Max: 90
+Metrics/PerceivedComplexity:
+  Max: 90
+Style/Next:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Style/ConditionalAssignment:
+  Enabled: false
+Metrics/ParameterLists:
+  Max: 8
+Metrics/ModuleLength:
+  Enabled: false
+Lint/SafeNavigationChain:
+  Enabled: false
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+Style/NestedParenthesizedCalls:
+  Enabled: false
+Style/EachWithObject:
+  Enabled: false
+Style/SpecialGlobalVars:
+  Enabled: false
+Style/SafeNavigation:
+  Enabled: false
+Lint/AssignmentInCondition:
+  Enabled: false
+Lint/ImplicitStringConcatenation:
+  Enabled: false
+Layout/HashAlignment:
+  Enabled: false
+Style/RescueModifier:
+  Enabled: false
+Naming/AccessorMethodName:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/RedundantInterpolation:
+  Enabled: false
+Style/RedundantParentheses:
+  Enabled: false
+Layout/LineLength:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+Layout/SpaceInsideStringInterpolation:
+  Enabled: false
+Style/ParenthesesAroundCondition:
+  Enabled: false
+Layout/SpaceAroundOperators:
+  Enabled: false
+Style/RescueStandardError:
+  Enabled: false
+Style/RedundantBegin:
+  Enabled: false
+Style/TrivialAccessors:
+  Enabled: false
+Lint/SuppressedException:
+  Enabled: false
+Gemspec/DeprecatedAttributeAssignment:
+  Enabled: false
+Gemspec/RequireMFA:
+  Enabled: false
+Layout/LineContinuationLeadingSpace: # new in 1.31
+  Enabled: true
+Layout/LineContinuationSpacing: # new in 1.31
+  Enabled: true
+Layout/LineEndStringConcatenationIndentation: # new in 1.18
+  Enabled: true
+Layout/SpaceBeforeBrackets: # new in 1.7
+  Enabled: true
+Lint/AmbiguousAssignment: # new in 1.7
+  Enabled: true
+Lint/AmbiguousOperatorPrecedence: # new in 1.21
+  Enabled: true
+Lint/AmbiguousRange: # new in 1.19
+  Enabled: true
+Lint/ConstantOverwrittenInRescue: # new in 1.31
+  Enabled: true
+Lint/DeprecatedConstants: # new in 1.8
+  Enabled: true
+Lint/DuplicateBranch: # new in 1.3
+  Enabled: true
+Lint/DuplicateRegexpCharacterClassElement: # new in 1.1
+  Enabled: true
+Lint/EmptyBlock: # new in 1.1
+  Enabled: true
+Lint/EmptyClass: # new in 1.3
+  Enabled: true
+Lint/EmptyInPattern: # new in 1.16
+  Enabled: true
+Lint/IncompatibleIoSelectWithFiberScheduler: # new in 1.21
+  Enabled: true
+Lint/LambdaWithoutLiteralBlock: # new in 1.8
+  Enabled: true
+Lint/NoReturnInBeginEndBlocks: # new in 1.2
+  Enabled: true
+Lint/NonAtomicFileOperation: # new in 1.31
+  Enabled: true
+Lint/NumberedParameterAssignment: # new in 1.9
+  Enabled: true
+Lint/OrAssignmentToConstant: # new in 1.9
+  Enabled: true
+Lint/RedundantDirGlobSort: # new in 1.8
+  Enabled: true
+Lint/RefinementImportMethods: # new in 1.27
+  Enabled: true
+Lint/RequireRangeParentheses: # new in 1.32
+  Enabled: true
+Lint/RequireRelativeSelfPath: # new in 1.22
+  Enabled: true
+Lint/SymbolConversion: # new in 1.9
+  Enabled: true
+Lint/ToEnumArguments: # new in 1.1
+  Enabled: true
+Lint/TripleQuotes: # new in 1.9
+  Enabled: true
+Lint/UnexpectedBlockArity: # new in 1.5
+  Enabled: true
+Lint/UnmodifiedReduceAccumulator: # new in 1.1
+  Enabled: true
+Lint/UselessRuby2Keywords: # new in 1.23
+  Enabled: true
+Naming/BlockForwarding: # new in 1.24
+  Enabled: true
+Security/CompoundHash: # new in 1.28
+  Enabled: true
+Security/IoMethods: # new in 1.22
+  Enabled: true
+Style/ArgumentsForwarding: # new in 1.1
+  Enabled: true
+Style/CollectionCompact: # new in 1.2
+  Enabled: true
+Style/DocumentDynamicEvalDefinition: # new in 1.1
+  Enabled: true
+Style/EmptyHeredoc: # new in 1.32
+  Enabled: true
+Style/EndlessMethod: # new in 1.8
+  Enabled: true
+Style/EnvHome: # new in 1.29
+  Enabled: true
+Style/FetchEnvVar: # new in 1.28
+  Enabled: true
+Style/FileRead: # new in 1.24
+  Enabled: true
+Style/FileWrite: # new in 1.24
+  Enabled: true
+Style/HashConversion: # new in 1.10
+  Enabled: true
+Style/HashExcept: # new in 1.7
+  Enabled: true
+Style/IfWithBooleanLiteralBranches: # new in 1.9
+  Enabled: true
+Style/InPatternThen: # new in 1.16
+  Enabled: true
+Style/MapCompactWithConditionalBlock: # new in 1.30
+  Enabled: true
+Style/MapToHash: # new in 1.24
+  Enabled: true
+Style/MultilineInPatternThen: # new in 1.16
+  Enabled: true
+Style/NegatedIfElseCondition: # new in 1.2
+  Enabled: true
+Style/NestedFileDirname: # new in 1.26
+  Enabled: true
+Style/NilLambda: # new in 1.3
+  Enabled: true
+Style/NumberedParameters: # new in 1.22
+  Enabled: true
+Style/NumberedParametersLimit: # new in 1.22
+  Enabled: true
+Style/ObjectThen: # new in 1.28
+  Enabled: true
+Style/OpenStructUse: # new in 1.23
+  Enabled: true
+Style/QuotedSymbols: # new in 1.16
+  Enabled: true
+Style/RedundantArgument: # new in 1.4
+  Enabled: true
+Style/RedundantInitialize: # new in 1.27
+  Enabled: true
+Style/RedundantSelfAssignmentBranch: # new in 1.19
+  Enabled: true
+Style/SelectByRegexp: # new in 1.22
+  Enabled: true
+Style/StringChars: # new in 1.12
+  Enabled: true
+Style/SwapValues: # new in 1.1
+  Enabled: true
+Style/FrozenStringLiteralComment:
+  Enabled: false

@@ -1,0 +1,16 @@
+respond_to do |format|
+    format.html { render :sales_report } # Explicitly render the view if not automatic
+    format.json { render json: @report_data }
+    format.csv do
+      send_data generate_csv_report,
+                filename: "sales_report_#{Date.today}.csv",
+                type: 'text/csv'
+    end
+    format.pdf do
+      send_data generate_pdf_report,
+                filename: "sales_report_#{Date.today}.pdf",
+                disposition: 'attachment',
+                type: 'application/pdf'
+    end
+  end
+  

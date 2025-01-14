@@ -64,6 +64,12 @@ group :development, :test do
     gem "pry-rails"
     gem "city-state"
     gem "webpacker"
+    gem "razorpay", "~> 3.2"
+    gem "groupdate"
+    gem 'rubocop', '~> 1.69', '>= 1.69.2'
+    gem 'prawn' 
+    gem 'caxlsx'
+    gem 'caxlsx_rails'
   end
 
   group :test do

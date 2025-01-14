@@ -47,55 +47,74 @@
                     <% end %>
                 </div>
 
-                <!-- Actions -->
+                <!-- search -->
                 <div class="flex items-center space-x-6">
-                    <!-- Search Bar -->
-                    <div data-controller="search" class="relative">
-                    <%= form_with url: search_usermodule_products_path, 
-                                  method: :get, 
-                                  class: "relative",
-                                  data: { turbo: false } do |f| %>
-                      <%= f.text_field :query,
-                          class: "w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500",
-                          placeholder: "Search products...",
-                          data: {
-                            search_target: "input",
-                            action: "input->search#search blur->search#hideResults"
-                          } %>
-                      <div class="absolute left-3 top-2.5 text-gray-400">
-                        <i class="fas fa-search"></i>
-                      </div>
-                    <% end %>
-                    
-                    <!-- Dropdown Results -->
-                    <div data-search-target="results"
-                         class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+                <%= form_with url: search_usermodule_products_path, 
+                    method: :get, 
+                    class: "relative", 
+                    data: { 
+                      controller: "search",
+                      search_min_chars_value: "2",
+                      search_debounce_value: "300"
+                    } do |f| %>
+                  <div class="relative">
+                    <%= f.text_field :query,
+                        class: "w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500",
+                        placeholder: "Search products...",
+                        autocomplete: "off",
+                        data: { 
+                          search_target: "input",
+                          action: "input->search#search focus->search#showResults blur->search#hideResults"
+                        } %>
+                    <div class="absolute left-3 top-2.5 text-gray-400">
+                      <i class="fas fa-search"></i>
+                    </div>
+                    <div class="absolute right-3 top-2.5 hidden" data-search-target="spinner">
+                      <div class="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
                     </div>
                   </div>
+                
+                  <!-- Dropdown Results -->
+                  <div data-search-target="results"
+                       class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto hidden">
+                  </div>
+                <% end %>
 
                    
-                        <!-- User Account -->
-                            <div class="relative group">
-                                <button class="text-gray-600 hover:text-gray-900 p-2">
-                                    <i class="far fa-user text-lg"></i>
-                                </button>
-                                <div class="dropdown-menu absolute left-0 md:left-auto right-0 w-64 mt-2 py-2 bg-white rounded-lg shadow-lg border border-gray-200">
-                                    <div class="px-4 py-3 border-b border-gray-200">
-                                        <p class="text-sm text-gray-500">Welcome,</p>
-                                        <p class="text-sm font-medium text-gray-800"><%= current_user.email %></p>
-                                    </div>
-                                    <%= link_to usermodule_orders_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
-                                        <i class="fas fa-box-open mr-2"></i> My Orders
-                                    <% end %>
-                                    <%= link_to usermodule_addresses_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
-                                        <i class="fas fa-map-marker-alt mr-2"></i> Addresses
-                                    <% end %>
-                                    <%= button_to session_path, method: :delete, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                    <% end %>
-                                </div>
-                            </div>
-                                                <!-- Cart -->
+                  <!-- User Account -->
+                  <div class="relative group">
+                      <button class="text-gray-600 hover:text-gray-900 p-2">
+                          <i class="far fa-user text-lg"></i>
+                      </button>
+                      <div class="dropdown-menu absolute left-0 md:left-auto right-0 w-64 mt-2 py-2 bg-white rounded-lg shadow-lg border border-gray-200">
+                          <div class="px-4 py-3 border-b border-gray-200">
+                              <p class="text-sm text-gray-500">Welcome,</p>
+                              <p class="text-sm font-medium text-gray-800"><%= current_user.email %></p>
+                          </div>
+                          <%= link_to usermodule_orders_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                              <i class="fas fa-box-open mr-2"></i> My Orders
+                          <% end %>
+                          <%= link_to usermodule_wallet_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                              <i class="fas fa-wallet mr-2"></i> My Wallet
+                          <% end %>
+                          <%= link_to usermodule_addresses_path, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                              <i class="fas fa-map-marker-alt mr-2"></i> Addresses
+                          <% end %>
+                          <%= button_to session_path, method: :delete, class: "block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900" do %>
+                              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                          <% end %>
+                      </div>
+                  </div>
+                  <!-- Wishlist -->
+                  <%= link_to usermodule_wishlists_path, class: "relative text-gray-600 hover:text-gray-900 p-2" do %>
+                      <i class="far fa-heart text-lg"></i>
+                      <% if current_user.wishlists.count > 0 %>
+                          <span class="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                              <%= current_user.wishlists.count %>
+                          </span>
+                      <% end %>
+                  <% end %>
+                <!-- Cart -->
                     <%= link_to usermodule_cart_path(current_user.cart || current_user.create_cart),
                         class: "relative text-gray-600 hover:text-gray-900 p-2" do %>
                         <i class="fas fa-shopping-cart text-lg"></i>
@@ -123,5 +142,98 @@
             </div>
         <% end %>
     </div>
+
+
+    <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  document.querySelectorAll('[data-controller="search"]').forEach(form => {
+    const input = form.querySelector('[data-search-target="input"]');
+    const results = form.querySelector('[data-search-target="results"]');
+    const spinner = form.querySelector('[data-search-target="spinner"]');
+    let debounceTimer;
+    let closeTimer;
+
+
+    input.addEventListener("input", function() {
+      clearTimeout(debounceTimer);
+      const query = this.value.trim();
+      
+
+      if (query.length >= 2) {
+        spinner.classList.remove('hidden');
+      }
+
+
+      debounceTimer = setTimeout(() => {
+        if (query.length >= 2) {
+          performSearch(query);
+        } else {
+          results.innerHTML = '';
+          results.classList.add('hidden');
+          spinner.classList.add('hidden');
+        }
+      }, 300);
+    });
+
+
+    input.addEventListener("focus", function() {
+      if (this.value.trim().length >= 2) {
+        results.classList.remove('hidden');
+      }
+    });
+
+
+    input.addEventListener("blur", function() {
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => {
+        results.classList.add('hidden');
+      }, 200);
+    });
+
+    async function performSearch(query) {
+      try {
+        const response = await fetch(`/usermodule/products/search?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        
+
+        if (data.length > 0) {
+          results.innerHTML = data.map(product => `
+            <a href="/usermodule/products/${product.id}" 
+               class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+              ${highlightMatch(product.name, query)}
+            </a>
+          `).join('');
+        } else {
+          results.innerHTML = `
+            <div class="px-4 py-2 text-sm text-gray-500">
+              No products found
+            </div>
+          `;
+        }
+        
+        results.classList.remove('hidden');
+      } catch (error) {
+        console.error('Search failed:', error);
+        results.innerHTML = `
+          <div class="px-4 py-2 text-sm text-gray-500">
+            Search failed. Please try again.
+          </div>
+        `;
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    function highlightMatch(text, query) {
+      const regex = new RegExp(`(${query})`, 'gi');
+      return text.replace(regex, '<mark class="bg-yellow-100">$1</mark>');
+    }
+  });
+});
+</script>
+
 </body>
+
 </html>
